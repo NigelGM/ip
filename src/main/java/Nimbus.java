@@ -11,22 +11,30 @@ public class Nimbus {
     }
 
     public void run() {
-        showGreeting();
-        System.out.println(); // <-- blank line before first user command
-
         Scanner sc = new Scanner(System.in);
+        TaskList taskList = new TaskList();
+
+        showGreeting();
+        System.out.println(); // blank line before first command (only keep if required)
 
         while (true) {
             String input = sc.nextLine().trim();
 
             if (input.equals("bye")) {
                 showGoodbye();
-                System.out.println(); // <-- optional; blank line after goodbye
+                System.out.println();
                 break;
             }
 
-            echo(input);
-            System.out.println(); // <-- blank line before next user command
+            if (input.equals("list")) {
+                showList(taskList);
+                System.out.println();
+                continue;
+            }
+
+            taskList.add(input);
+            showAdded(input);
+            System.out.println();
         }
     }
 
@@ -37,9 +45,17 @@ public class Nimbus {
         System.out.println(INDENT + LINE);
     }
 
-    private void echo(String msg) {
+    private void showAdded(String task) {
         System.out.println(INDENT + LINE);
-        System.out.println(INDENT + msg);
+        System.out.println(INDENT + "added: " + task);
+        System.out.println(INDENT + LINE);
+    }
+
+    private void showList(TaskList taskList) {
+        System.out.println(INDENT + LINE);
+        for (int i = 0; i < taskList.size(); i++) {
+            System.out.println(INDENT + (i + 1) + ". " + taskList.get(i));
+        }
         System.out.println(INDENT + LINE);
     }
 
@@ -49,6 +65,7 @@ public class Nimbus {
         System.out.println(INDENT + LINE);
     }
 }
+
 
 
 
