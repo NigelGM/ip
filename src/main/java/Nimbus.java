@@ -2,7 +2,9 @@ import java.util.Scanner;
 
 public class Nimbus {
 
-    private static final String LINE = "____________________________________________________________";
+    private static final String LINE =
+            "____________________________________________________________";
+    private static final String INDENT = "    ";
 
     public static void main(String[] args) {
         new Nimbus().run();
@@ -13,17 +15,20 @@ public class Nimbus {
         TaskList taskList = new TaskList();
 
         showGreeting();
+        System.out.println();
 
         while (true) {
             String input = sc.nextLine().trim();
 
             if (input.equals("bye")) {
                 showGoodbye();
+                System.out.println();
                 break;
             }
 
             if (input.equals("list")) {
                 showList(taskList);
+                System.out.println();
                 continue;
             }
 
@@ -31,6 +36,7 @@ public class Nimbus {
                 int idx = Integer.parseInt(input.substring(5).trim());
                 Task t = taskList.mark(idx);
                 showMarked(t);
+                System.out.println();
                 continue;
             }
 
@@ -38,97 +44,59 @@ public class Nimbus {
                 int idx = Integer.parseInt(input.substring(7).trim());
                 Task t = taskList.unmark(idx);
                 showUnmarked(t);
+                System.out.println();
                 continue;
             }
 
-            if (input.startsWith("todo ")) {
-                String desc = input.substring(5).trim();
-                Task t = new Todo(desc);
-                taskList.add(t);
-                showAdded(t, taskList.size());
-                continue;
-            }
-
-            if (input.startsWith("deadline ")) {
-                // deadline <desc> /by <by>
-                int byPos = input.indexOf(" /by ");
-                String desc = input.substring(9, byPos).trim();
-                String by = input.substring(byPos + 5).trim();
-
-                Task t = new Deadline(desc, by);
-                taskList.add(t);
-                showAdded(t, taskList.size());
-                continue;
-            }
-
-            if (input.startsWith("event ")) {
-                // event <desc> /from <from> /to <to>
-                int fromPos = input.indexOf(" /from ");
-                int toPos = input.indexOf(" /to ");
-
-                String desc = input.substring(6, fromPos).trim();
-                String from = input.substring(fromPos + 7, toPos).trim();
-                String to = input.substring(toPos + 5).trim();
-
-                Task t = new Event(desc, from, to);
-                taskList.add(t);
-                showAdded(t, taskList.size());
-                continue;
-            }
-
-            // If your spec says "anything else is a task", you can decide what to do here.
-            // For now: treat it as a todo
-            Task t = new Todo(input);
-            taskList.add(t);
-            showAdded(t, taskList.size());
+            // default: treat as task description to add
+            taskList.add(input);
+            showAdded(input);
+            System.out.println();
         }
     }
 
     private void showGreeting() {
-        System.out.println(LINE);
-        System.out.println("Hello! I'm Nimbus");
-        System.out.println("What can I do for you?");
-        System.out.println(LINE);
+        System.out.println(INDENT + LINE);
+        System.out.println(INDENT + "Hello! I'm Nimbus");
+        System.out.println(INDENT + "What can I do for you?");
+        System.out.println(INDENT + LINE);
     }
 
-    private void showGoodbye() {
-        System.out.println(LINE);
-        System.out.println("Bye. Hope to see you again soon!");
-        System.out.println(LINE);
-    }
-
-    private void showAdded(Task task, int count) {
-        System.out.println(LINE);
-        System.out.println("Got it. I've added this task:");
-        System.out.println("  " + task);
-        System.out.println("Now you have " + count + " tasks in the list.");
-        System.out.println(LINE);
+    private void showAdded(String task) {
+        System.out.println(INDENT + LINE);
+        System.out.println(INDENT + "added: " + task);
+        System.out.println(INDENT + LINE);
     }
 
     private void showList(TaskList taskList) {
-        System.out.println(LINE);
-        System.out.println("Here are the tasks in your list:");
+        System.out.println(INDENT + LINE);
+        System.out.println(INDENT + "Here are the tasks in your list:");
         for (int i = 0; i < taskList.size(); i++) {
-            System.out.println((i + 1) + ". " + taskList.get(i));
+            System.out.println(INDENT + (i + 1) + ". " + taskList.get(i));
         }
-        System.out.println(LINE);
+        System.out.println(INDENT + LINE);
     }
 
     private void showMarked(Task task) {
-        System.out.println(LINE);
-        System.out.println("Nice! I've marked this task as done:");
-        System.out.println("  " + task);
-        System.out.println(LINE);
+        System.out.println(INDENT + LINE);
+        System.out.println(INDENT + "Nice! I've marked this task as done:");
+        System.out.println(INDENT + task);
+        System.out.println(INDENT + LINE);
     }
 
     private void showUnmarked(Task task) {
-        System.out.println(LINE);
-        System.out.println("OK, I've marked this task as not done yet:");
-        System.out.println("  " + task);
-        System.out.println(LINE);
+        System.out.println(INDENT + LINE);
+        System.out.println(INDENT + "OK, I've marked this task as not done yet:");
+        System.out.println(INDENT + task);
+        System.out.println(INDENT + LINE);
+    }
+
+    private void showGoodbye() {
+        System.out.println(INDENT + LINE);
+        System.out.println(INDENT + "Bye. Hope to see you again soon!");
+        System.out.println(INDENT + LINE);
     }
 }
-
 
 
 
