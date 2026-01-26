@@ -1,22 +1,24 @@
 public class TaskList {
+
     private static final int MAX_TASKS = 100;
 
     private final Task[] tasks = new Task[MAX_TASKS];
-    private int size = 0;
+    private int taskCount = 0;
+
+    public void add(String description) {
+        tasks[taskCount] = new Task(description);
+        taskCount++;
+    }
 
     public int size() {
-        return size;
+        return taskCount;
     }
 
     public Task get(int index) {
         return tasks[index];
     }
 
-    public void add(Task task) {
-        tasks[size] = task;
-        size++;
-    }
-
+    // user types "mark 2" -> index = 1
     public Task mark(int oneBasedIndex) {
         Task t = tasks[oneBasedIndex - 1];
         t.markDone();
@@ -29,6 +31,5 @@ public class TaskList {
         return t;
     }
 }
-
 
 
