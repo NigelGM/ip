@@ -15,7 +15,7 @@ public class Nimbus {
         TaskList taskList = new TaskList();
 
         showGreeting();
-        System.out.println(); // blank line before first command (only keep if required)
+        System.out.println();
 
         while (true) {
             String input = sc.nextLine().trim();
@@ -32,6 +32,23 @@ public class Nimbus {
                 continue;
             }
 
+            if (input.startsWith("mark ")) {
+                int idx = Integer.parseInt(input.substring(5).trim());
+                Task t = taskList.mark(idx);
+                showMarked(t);
+                System.out.println();
+                continue;
+            }
+
+            if (input.startsWith("unmark ")) {
+                int idx = Integer.parseInt(input.substring(7).trim());
+                Task t = taskList.unmark(idx);
+                showUnmarked(t);
+                System.out.println();
+                continue;
+            }
+
+            // default: treat as task description to add
             taskList.add(input);
             showAdded(input);
             System.out.println();
@@ -53,9 +70,24 @@ public class Nimbus {
 
     private void showList(TaskList taskList) {
         System.out.println(INDENT + LINE);
+        System.out.println(INDENT + "Here are the tasks in your list:");
         for (int i = 0; i < taskList.size(); i++) {
             System.out.println(INDENT + (i + 1) + ". " + taskList.get(i));
         }
+        System.out.println(INDENT + LINE);
+    }
+
+    private void showMarked(Task task) {
+        System.out.println(INDENT + LINE);
+        System.out.println(INDENT + "Nice! I've marked this task as done:");
+        System.out.println(INDENT + task);
+        System.out.println(INDENT + LINE);
+    }
+
+    private void showUnmarked(Task task) {
+        System.out.println(INDENT + LINE);
+        System.out.println(INDENT + "OK, I've marked this task as not done yet:");
+        System.out.println(INDENT + task);
         System.out.println(INDENT + LINE);
     }
 
@@ -65,6 +97,7 @@ public class Nimbus {
         System.out.println(INDENT + LINE);
     }
 }
+
 
 
 
