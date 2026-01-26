@@ -77,6 +77,7 @@ public class Nimbus {
             }
 
             // If your spec says "anything else is a task", you can decide what to do here.
+            // For now: treat it as a todo
             Task t = new Todo(input);
             taskList.add(t);
             showAdded(t, taskList.size());
