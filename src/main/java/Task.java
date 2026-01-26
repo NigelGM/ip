@@ -15,16 +15,12 @@ public class Task {
         this.isDone = false;
     }
 
-    public boolean isDone() {
-        return this.isDone;
+    public String getStatusIcon() {
+        return isDone ? "X" : " ";
     }
 
     public String getDescription() {
-        return this.description;
-    }
-
-    public String getStatusIcon() {
-        return isDone() ? "X" : " ";
+        return description;
     }
 
     @Override
@@ -32,4 +28,5 @@ public class Task {
         return "[" + getStatusIcon() + "] " + getDescription();
     }
 }
+
 
