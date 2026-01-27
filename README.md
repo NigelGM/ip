@@ -1,26 +1,59 @@
-# Duke project template
+# Nimbus Task List Application ☁️✅
 
-This is a project template for a greenfield Java project. It's named after the Java mascot _Nimbus_. Given below are instructions on how to use it.
+Welcome to **Nimbus**, a lightweight CLI task manager (inspired by the Duke project) that helps you track tasks quickly from the terminal. Nimbus supports adding tasks, listing them, and marking/unmarking completion — with a clean, consistent text UI.
 
-## Setting up in Intellij
+---
 
-Prerequisites: JDK 17, update Intellij to the most recent version.
+## 🚀 Features
 
-1. Open Intellij (if you are not in the welcome screen, click `File` > `Close Project` to close the existing project first)
-1. Open the project into Intellij as follows:
-   1. Click `Open`.
-   1. Select the project directory, and click `OK`.
-   1. If there are any further prompts, accept the defaults.
-1. Configure the project to use **JDK 17** (not other versions) as explained in [here](https://www.jetbrains.com/help/idea/sdk.html#set-up-jdk).<br>
-   In the same dialog, set the **Project language level** field to the `SDK default` option.
-1. After that, locate the `src/main/java/Nimbus.java` file, right-click it, and choose `Run Nimbus.main()` (if the code editor is showing compile errors, try restarting the IDE). If the setup is correct, you should see something like the below as the output:
-   ```
-   Hello from
-    ____        _        
-   |  _ \ _   _| | _____ 
-   | | | | | | | |/ / _ \
-   | |_| | |_| |   <  __/
-   |____/ \__,_|_|\_\___|
-   ```
+### ✅ Task Creation
+Add tasks using:
+- `todo <description>`
+- `deadline <description> /by <when>`
+- `event <description> /from <start> /to <end>`
 
-**Warning:** Keep the `src\main\java` folder as the root folder for Java files (i.e., don't rename those folders or move Java files to another folder outside of this folder path), as this is the default location some tools (e.g., Gradle) expect to find Java files.
+### ✅ Task Management
+- `list` — view all tasks
+- `mark <index>` — mark a task as done
+- `unmark <index>` — mark a task as not done
+
+### ✅ Clean Text UI
+Nimbus prints responses in a consistent “boxed” format for readability.
+
+> Note: Nimbus is currently a **CLI (text UI)** application. Features like GUI and auto-saving should only be listed if you have implemented them.
+
+---
+
+## 🧩 Command Summary
+
+| Command | Example |
+|---|---|
+| Add todo | `todo borrow book` |
+| Add deadline | `deadline return book /by Sunday` |
+| Add event | `event project meeting /from Mon 2pm /to 4pm` |
+| List tasks | `list` |
+| Mark done | `mark 2` |
+| Unmark | `unmark 2` |
+| Exit | `bye` |
+
+---
+
+## 🛠 Installation & Setup
+
+### Prerequisites
+- **JDK 17**
+- IntelliJ IDEA (recommended)
+
+### Run in IntelliJ
+1. Open the project folder in IntelliJ.
+2. Set Project SDK to **JDK 17**.
+3. Run `Nimbus.main()` from `src/main/java/Nimbus.java`.
+
+(Your original template instructions were here — you can keep or delete that section depending on how “personal” you want the README to be.)  
+Template reminder: keep `src/main/java` as the root folder for Java files. :contentReference[oaicite:1]{index=1}
+
+### Run from Terminal (if Gradle wrapper exists)
+From project root:
+- Windows:
+  ```powershell
+  .\gradlew.bat run
