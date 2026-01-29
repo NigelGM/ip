@@ -1,8 +1,10 @@
 public abstract class Task {
     private final String description;
     private boolean isDone;
+    private final TaskType type;
 
-    public Task(String description) {
+    protected Task(TaskType type, String description) {
+        this.type = type;
         this.description = description;
         this.isDone = false;
     }
@@ -19,17 +21,16 @@ public abstract class Task {
         return isDone ? "X" : " ";
     }
 
-    protected abstract String getTypeIcon();
-
-    protected String getExtraInfo() {
-        return "";
+    public String getTypeIcon() {
+        return type.getIcon();
     }
 
     @Override
     public String toString() {
-        return "[" + getTypeIcon() + "][" + getStatusIcon() + "] " + description + getExtraInfo();
+        return "[" + getTypeIcon() + "][" + getStatusIcon() + "] " + description;
     }
 }
+
 
 
 
