@@ -15,14 +15,6 @@ public abstract class Task {
         this.isDone = false;
     }
 
-    public boolean isDone() {
-        return this.isDone;
-    }
-
-    public String getDescription() {
-        return this.description;
-    }
-
     public String getStatusIcon() {
         return isDone ? "X" : " ";
     }
