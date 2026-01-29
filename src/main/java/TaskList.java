@@ -1,7 +1,7 @@
-// TaskList.java
 import java.util.ArrayList;
 import java.util.List;
 
+// TaskList.java
 public class TaskList {
     private final ArrayList<Task> tasks;
 
@@ -9,12 +9,31 @@ public class TaskList {
         this.tasks = new ArrayList<>();
     }
 
+    // NEW: build tasks from saved lines
+    public TaskList(List<String> storedLines) {
+        this.tasks = new ArrayList<>();
+        for (String line : storedLines) {
+            Task t = Parser.parseStoredTask(line); // returns null if corrupted
+            if (t != null) {
+                tasks.add(t);
+            }
+        }
+    }
+
+    // NEW: convert tasks to lines to save
+    public List<String> toStorageLines() {
+        ArrayList<String> lines = new ArrayList<>();
+        for (Task t : tasks) {
+            lines.add(t.toStorageString());
+        }
+        return lines;
+    }
+
     public int add(Task task) {
         tasks.add(task);
         return tasks.size();
     }
 
-    // One-based access (used by mark/unmark/delete commands)
     public Task get(int oneBasedIndex) throws NimbusException {
         int idx = oneBasedIndex - 1;
         if (idx < 0 || idx >= tasks.size()) {
@@ -23,7 +42,6 @@ public class TaskList {
         return tasks.get(idx);
     }
 
-    // ✅ Option A: zero-based access (used by Ui.showList)
     public Task getByZeroBasedIndex(int index) throws NimbusException {
         if (index < 0 || index >= tasks.size()) {
             throw new NimbusException("Task number is out of range.");
@@ -41,15 +59,6 @@ public class TaskList {
 
     public int size() {
         return tasks.size();
-    }
-
-    // Level-7: convert current tasks into lines to save
-    public List<String> toStorageLines() {
-        List<String> lines = new ArrayList<>();
-        for (Task t : tasks) {
-            lines.add(t.toStorageString());
-        }
-        return lines;
     }
 }
 
