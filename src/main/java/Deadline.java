@@ -7,6 +7,13 @@ public class Deadline extends Task {
     }
 
     @Override
+    public String toStorageString() {
+        return getType().getIcon() + " | " + (isDone() ? "1" : "0")
+                + " | " + getDescription() + " | " + by;
+    }
+
+
+    @Override
     public String toString() {
         return super.toString() + " (by: " + by + ")";
     }

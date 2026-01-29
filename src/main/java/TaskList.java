@@ -1,5 +1,6 @@
 // TaskList.java
 import java.util.ArrayList;
+import java.util.List;
 
 public class TaskList {
     private final ArrayList<Task> tasks;
@@ -40,6 +41,15 @@ public class TaskList {
 
     public int size() {
         return tasks.size();
+    }
+
+    // Level-7: convert current tasks into lines to save
+    public List<String> toStorageLines() {
+        List<String> lines = new ArrayList<>();
+        for (Task t : tasks) {
+            lines.add(t.toStorageString());
+        }
+        return lines;
     }
 }
 
