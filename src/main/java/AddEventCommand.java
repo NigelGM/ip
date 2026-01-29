@@ -1,9 +1,11 @@
+import java.time.LocalDateTime;
+
 public class AddEventCommand implements Command {
     private final String description;
-    private final String from;
-    private final String to;
+    private final LocalDateTime from;
+    private final LocalDateTime to;
 
-    public AddEventCommand(String description, String from, String to) {
+    public AddEventCommand(String description, LocalDateTime from, LocalDateTime to) {
         this.description = description;
         this.from = from;
         this.to = to;
@@ -11,9 +13,9 @@ public class AddEventCommand implements Command {
 
     @Override
     public void execute(TaskList tasks, Ui ui) throws NimbusException {
-        Task t = new Event(description, from, to);
-        int size = tasks.add(t);
-        ui.showAdded(t, size);
+        Event e = new Event(description, from, to);
+        int size = tasks.add(e);
+        ui.showAdded(e, size);
     }
 
     @Override
@@ -21,3 +23,5 @@ public class AddEventCommand implements Command {
         return false;
     }
 }
+
+

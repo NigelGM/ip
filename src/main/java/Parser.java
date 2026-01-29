@@ -1,3 +1,5 @@
+import java.time.LocalDateTime;
+
 public class Parser {
 
     public static Command parse(String input) throws NimbusException {
@@ -34,7 +36,7 @@ public class Parser {
     }
 
     private static Command parseDeadline(String trimmed) throws NimbusException {
-        // deadline <desc> /by <by>
+        // deadline <desc> /by <yyyy-MM-dd HHmm>
         String remainder = trimmed.substring("deadline".length()).trim();
         if (remainder.isEmpty()) {
             throw new NimbusException("Oops! The description of a deadline cannot be empty.");
@@ -42,24 +44,25 @@ public class Parser {
 
         int byPos = remainder.indexOf(" /by ");
         if (byPos == -1) {
-            throw new NimbusException("Deadline format: deadline <task> /by <when>");
+            throw new NimbusException("Deadline format: deadline <task> /by <yyyy-MM-dd HHmm>");
         }
 
         String desc = remainder.substring(0, byPos).trim();
-        String by = remainder.substring(byPos + 5).trim(); // 5 = len(" /by ")
+        String byStr = remainder.substring(byPos + 5).trim(); // len(" /by ") = 5
 
         if (desc.isEmpty()) {
             throw new NimbusException("Oops! The description of a deadline cannot be empty.");
         }
-        if (by.isEmpty()) {
+        if (byStr.isEmpty()) {
             throw new NimbusException("Oops! The /by part of a deadline cannot be empty.");
         }
 
-        return new AddDeadlineCommand(desc, by);
+        LocalDateTime byDt = DateTimeUtil.parseDateTime(byStr);
+        return new AddDeadlineCommand(desc, byDt);
     }
 
     private static Command parseEvent(String trimmed) throws NimbusException {
-        // event <desc> /from <start> /to <end>
+        // event <desc> /from <yyyy-MM-dd HHmm> /to <yyyy-MM-dd HHmm>
         String remainder = trimmed.substring("event".length()).trim();
         if (remainder.isEmpty()) {
             throw new NimbusException("Oops! The description of an event cannot be empty.");
@@ -69,24 +72,26 @@ public class Parser {
         int toPos = remainder.indexOf(" /to ");
 
         if (fromPos == -1 || toPos == -1 || toPos < fromPos) {
-            throw new NimbusException("Event format: event <task> /from <start> /to <end>");
+            throw new NimbusException("Event format: event <task> /from <yyyy-MM-dd HHmm> /to <yyyy-MM-dd HHmm>");
         }
 
         String desc = remainder.substring(0, fromPos).trim();
-        String from = remainder.substring(fromPos + 7, toPos).trim(); // 7 = len(" /from ")
-        String to = remainder.substring(toPos + 5).trim();           // 5 = len(" /to ")
+        String fromStr = remainder.substring(fromPos + 7, toPos).trim(); // len(" /from ") = 7
+        String toStr = remainder.substring(toPos + 5).trim();           // len(" /to ") = 5
 
         if (desc.isEmpty()) {
             throw new NimbusException("Oops! The description of an event cannot be empty.");
         }
-        if (from.isEmpty()) {
+        if (fromStr.isEmpty()) {
             throw new NimbusException("Oops! The /from part of an event cannot be empty.");
         }
-        if (to.isEmpty()) {
+        if (toStr.isEmpty()) {
             throw new NimbusException("Oops! The /to part of an event cannot be empty.");
         }
 
-        return new AddEventCommand(desc, from, to);
+        LocalDateTime fromDt = DateTimeUtil.parseDateTime(fromStr);
+        LocalDateTime toDt = DateTimeUtil.parseDateTime(toStr);
+        return new AddEventCommand(desc, fromDt, toDt);
     }
 
     private static int parseIndex(String[] parts, String cmd) throws NimbusException {
@@ -105,45 +110,50 @@ public class Parser {
         }
     }
 
-    // =========================
-    // Level-7: Load from storage
-    // =========================
+    // Used when loading from your save file
     public static Task parseStoredTask(String line) {
         // Expected formats:
         // T | 1 | read book
-        // D | 0 | return book | June 6th
-        // E | 0 | project meeting | Aug 6th 2-4pm | Aug 6th 4-6pm
+        // D | 0 | return book | 2019-12-02T18:00
+        // E | 0 | meeting | 2019-12-02T14:00 | 2019-12-02T16:00
         try {
-            String[] parts = line.split(" \\| ");
-            if (parts.length < 3) {
-                return null;
-            }
+            String[] p = line.split(" \\| ");
+            if (p.length < 3) return null;
 
-            TaskType type = TaskType.fromIcon(parts[0]);
-            boolean done = parts[1].equals("1");
-            String desc = parts[2];
+            String icon = p[0].trim();
+            boolean done = p[1].trim().equals("1");
+            String desc = p[2].trim();
+
+            TaskType type = TaskType.fromIcon(icon);
 
             Task task = switch (type) {
                 case TODO -> new Todo(desc);
+
                 case DEADLINE -> {
-                    if (parts.length < 4) yield null;
-                    yield new Deadline(desc, parts[3]);
+                    if (p.length < 4) yield null;
+                    LocalDateTime byDt = DateTimeUtil.parseDateTime(p[3].trim());
+                    yield new Deadline(desc, byDt);
                 }
+
                 case EVENT -> {
-                    if (parts.length < 5) yield null;
-                    yield new Event(desc, parts[3], parts[4]);
+                    if (p.length < 5) yield null;
+                    LocalDateTime fromDt = DateTimeUtil.parseDateTime(p[3].trim());
+                    LocalDateTime toDt = DateTimeUtil.parseDateTime(p[4].trim());
+                    yield new Event(desc, fromDt, toDt);
                 }
             };
 
-            if (task != null && done) {
-                task.markDone();
-            }
+            if (task == null) return null;
+            if (done) task.markDone();
             return task;
+
         } catch (Exception e) {
-            // corrupted line -> ignore (stretch goal is to handle more carefully)
-            return null;
+            return null; // ignore corrupted lines safely
         }
     }
 }
+
+
+
 
 
