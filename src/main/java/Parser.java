@@ -105,5 +105,45 @@ public class Parser {
         }
     }
 
+    // =========================
+    // Level-7: Load from storage
+    // =========================
+    public static Task parseStoredTask(String line) {
+        // Expected formats:
+        // T | 1 | read book
+        // D | 0 | return book | June 6th
+        // E | 0 | project meeting | Aug 6th 2-4pm | Aug 6th 4-6pm
+        try {
+            String[] parts = line.split(" \\| ");
+            if (parts.length < 3) {
+                return null;
+            }
+
+            TaskType type = TaskType.fromIcon(parts[0]);
+            boolean done = parts[1].equals("1");
+            String desc = parts[2];
+
+            Task task = switch (type) {
+                case TODO -> new Todo(desc);
+                case DEADLINE -> {
+                    if (parts.length < 4) yield null;
+                    yield new Deadline(desc, parts[3]);
+                }
+                case EVENT -> {
+                    if (parts.length < 5) yield null;
+                    yield new Event(desc, parts[3], parts[4]);
+                }
+            };
+
+            if (task != null && done) {
+                task.markDone();
+            }
+            return task;
+        } catch (Exception e) {
+            // corrupted line -> ignore (stretch goal is to handle more carefully)
+            return null;
+        }
+    }
 }
+
 

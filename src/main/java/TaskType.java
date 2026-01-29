@@ -12,4 +12,14 @@ public enum TaskType {
     public String getIcon() {
         return icon;
     }
+
+    public static TaskType fromIcon(String icon) {
+        for (TaskType t : TaskType.values()) {
+            if (t.icon.equals(icon)) {
+                return t;
+            }
+        }
+        throw new IllegalArgumentException("Unknown task type icon: " + icon);
+    }
 }
+

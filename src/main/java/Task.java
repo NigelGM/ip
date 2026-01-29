@@ -24,6 +24,22 @@ public abstract class Task {
     public String getTypeIcon() {
         return type.getIcon();
     }
+    public boolean isDone() {
+        return isDone;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public TaskType getType() {
+        return type;
+    }
+
+    public String toStorageString() {
+        return type.getIcon() + " | " + (isDone ? "1" : "0") + " | " + description;
+    }
+
 
     @Override
     public String toString() {
