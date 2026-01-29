@@ -1,3 +1,4 @@
+// Ui.java
 public class Ui {
     private static final String LINE = "____________________________________________________________";
     private static final String INDENT = "    "; // 4 spaces
@@ -6,14 +7,15 @@ public class Ui {
         System.out.println(LINE);
     }
 
+    // Nimbus responses (indented)
     private void say(String msg) {
         System.out.println(INDENT + msg);
     }
 
     public void showGreeting() {
         printLine();
-        say("Hello! I'm Nimbus");
-        say("What can I do for you?");
+        System.out.println("Hello! I'm Nimbus");        // left-aligned
+        System.out.println("What can I do for you?");   // left-aligned
         printLine();
     }
 
@@ -37,11 +39,18 @@ public class Ui {
         printLine();
     }
 
+    // ✅ Option A uses getByZeroBasedIndex (no getTasks exposure)
     public void showList(TaskList tasks) {
         printLine();
         say("Here are the tasks in your list:");
         for (int i = 0; i < tasks.size(); i++) {
-            say((i + 1) + ". " + tasks.getByZeroBasedIndex(i));
+            try {
+                say((i + 1) + ". " + tasks.getByZeroBasedIndex(i));
+            } catch (NimbusException e) {
+                // Should never happen because i is within size(),
+                // but keep it safe if TaskList changes later.
+                say("Error displaying task " + (i + 1) + ": " + e.getMessage());
+            }
         }
         printLine();
     }
@@ -68,6 +77,8 @@ public class Ui {
         printLine();
     }
 }
+
+
 
 
 

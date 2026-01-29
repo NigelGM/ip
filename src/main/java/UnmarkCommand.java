@@ -7,7 +7,7 @@ public class UnmarkCommand implements Command {
 
     @Override
     public void execute(TaskList tasks, Ui ui) throws NimbusException {
-        Task t = tasks.getByUserIndex(userIndex);
+        Task t = tasks.get(userIndex);
         t.unmark();
         ui.showUnmarked(t);
     }

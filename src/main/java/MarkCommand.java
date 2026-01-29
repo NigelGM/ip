@@ -7,7 +7,7 @@ public class MarkCommand implements Command {
 
     @Override
     public void execute(TaskList tasks, Ui ui) throws NimbusException {
-        Task t = tasks.getByUserIndex(userIndex);
+        Task t = tasks.get(userIndex);
         t.markDone();
         ui.showMarked(t);
     }

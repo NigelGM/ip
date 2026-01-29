@@ -95,10 +95,15 @@ public class Parser {
         }
 
         try {
-            return Integer.parseInt(parts[1].trim());
+            int n = Integer.parseInt(parts[1].trim());
+            if (n <= 0) {
+                throw new NimbusException("Task number must be a positive integer. Example: " + cmd + " 2");
+            }
+            return n;
         } catch (NumberFormatException e) {
             throw new NimbusException("Task number must be an integer. Example: " + cmd + " 2");
         }
     }
+
 }
 

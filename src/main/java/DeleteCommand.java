@@ -1,13 +1,13 @@
 public class DeleteCommand implements Command {
-    private final int userIndex;
+    private final int oneBasedIndex;
 
-    public DeleteCommand(int userIndex) {
-        this.userIndex = userIndex;
+    public DeleteCommand(int oneBasedIndex) {
+        this.oneBasedIndex = oneBasedIndex;
     }
 
     @Override
     public void execute(TaskList tasks, Ui ui) throws NimbusException {
-        Task removed = tasks.deleteByUserIndex(userIndex);
+        Task removed = tasks.delete(oneBasedIndex);
         ui.showDeleted(removed, tasks.size());
     }
 
@@ -16,4 +16,5 @@ public class DeleteCommand implements Command {
         return false;
     }
 }
+
 

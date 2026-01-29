@@ -1,52 +1,50 @@
-public class TaskList {
-    private static final int MAX = 100;
+// TaskList.java
+import java.util.ArrayList;
 
-    private final Task[] tasks = new Task[MAX];
-    private int size = 0;
+public class TaskList {
+    private final ArrayList<Task> tasks;
+
+    public TaskList() {
+        this.tasks = new ArrayList<>();
+    }
+
+    public int add(Task task) {
+        tasks.add(task);
+        return tasks.size();
+    }
+
+    // One-based access (used by mark/unmark/delete commands)
+    public Task get(int oneBasedIndex) throws NimbusException {
+        int idx = oneBasedIndex - 1;
+        if (idx < 0 || idx >= tasks.size()) {
+            throw new NimbusException("Task number is out of range.");
+        }
+        return tasks.get(idx);
+    }
+
+    // ✅ Option A: zero-based access (used by Ui.showList)
+    public Task getByZeroBasedIndex(int index) throws NimbusException {
+        if (index < 0 || index >= tasks.size()) {
+            throw new NimbusException("Task number is out of range.");
+        }
+        return tasks.get(index);
+    }
+
+    public Task delete(int oneBasedIndex) throws NimbusException {
+        int idx = oneBasedIndex - 1;
+        if (idx < 0 || idx >= tasks.size()) {
+            throw new NimbusException("Task number is out of range.");
+        }
+        return tasks.remove(idx);
+    }
 
     public int size() {
-        return size;
-    }
-
-    public int add(Task task) throws NimbusException {
-        if (size >= MAX) {
-            throw new NimbusException("Your task list is full (max " + MAX + ").");
-        }
-        tasks[size] = task;
-        size++;
-        return size;
-    }
-
-    public Task getByZeroBasedIndex(int idx) {
-        return tasks[idx];
-    }
-
-    public Task getByUserIndex(int userIndex) throws NimbusException {
-        int idx = userIndex - 1;
-        if (idx < 0 || idx >= size) {
-            throw new NimbusException("That task number is out of range.");
-        }
-        return tasks[idx];
-    }
-
-    public Task deleteByUserIndex(int userIndex) throws NimbusException {
-        int idx = userIndex - 1;
-        if (idx < 0 || idx >= size) {
-            throw new NimbusException("That task number is out of range.");
-        }
-
-        Task removed = tasks[idx];
-
-        // shift left
-        for (int i = idx; i < size - 1; i++) {
-            tasks[i] = tasks[i + 1];
-        }
-        tasks[size - 1] = null;
-        size--;
-
-        return removed;
+        return tasks.size();
     }
 }
+
+
+
 
 
 
