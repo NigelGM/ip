@@ -1,10 +1,19 @@
+import java.util.Scanner;
+
 // Ui.java
 public class Ui {
     private static final String LINE = "____________________________________________________________";
     private static final String INDENT = "    "; // 4 spaces
 
+    private final Scanner scanner = new Scanner(System.in);
+
     private void printLine() {
         System.out.println(LINE);
+    }
+
+    // optional helper (used by Nimbus finally-block)
+    public void showLine() {
+        printLine();
     }
 
     // Nimbus responses (indented)
@@ -12,10 +21,15 @@ public class Ui {
         System.out.println(INDENT + msg);
     }
 
+    // read one full command line from user
+    public String readCommand() {
+        return scanner.nextLine();
+    }
+
     public void showGreeting() {
         printLine();
-        System.out.println("Hello! I'm Nimbus");        // left-aligned
-        System.out.println("What can I do for you?");   // left-aligned
+        System.out.println("Hello! I'm Nimbus");
+        System.out.println("What can I do for you?");
         printLine();
     }
 
@@ -39,7 +53,6 @@ public class Ui {
         printLine();
     }
 
-    // ✅ Option A uses getByZeroBasedIndex (no getTasks exposure)
     public void showList(TaskList tasks) {
         printLine();
         say("Here are the tasks in your list:");
@@ -47,8 +60,6 @@ public class Ui {
             try {
                 say((i + 1) + ". " + tasks.getByZeroBasedIndex(i));
             } catch (NimbusException e) {
-                // Should never happen because i is within size(),
-                // but keep it safe if TaskList changes later.
                 say("Error displaying task " + (i + 1) + ": " + e.getMessage());
             }
         }
@@ -77,6 +88,7 @@ public class Ui {
         printLine();
     }
 }
+
 
 
 

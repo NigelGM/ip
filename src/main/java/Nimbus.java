@@ -1,57 +1,60 @@
 import java.io.IOException;
-import java.util.Scanner;
+import java.util.List;
 
 public class Nimbus {
-    private static final String SAVE_FILE_PATH = "data/nimbus.txt";
+    private final Storage storage;
+    private final TaskList tasks;
+    private final Ui ui;
 
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        Ui ui = new Ui();
-        TaskList tasks = new TaskList();
-        Storage storage = new Storage(SAVE_FILE_PATH);
+    public Nimbus(String filePath) {
+        this.ui = new Ui();
+        this.storage = new Storage(filePath);
 
-        // Load tasks at startup (Level-7)
+        TaskList loaded;
         try {
-            for (String line : storage.loadLines()) {
-                Task t = Parser.parseStoredTask(line);
-                if (t != null) {
-                    tasks.add(t);
-                }
-            }
+            List<String> lines = storage.loadLines();
+            loaded = new TaskList(lines);
         } catch (IOException e) {
-            ui.showError("Could not load saved tasks: " + e.getMessage());
+            // if file doesn't exist or can't be read, start fresh
+            loaded = new TaskList();
+            ui.showError("Could not load save file. Starting with an empty list.");
         }
+        this.tasks = loaded;
+    }
 
+    public void run() {
         ui.showGreeting();
 
         boolean isExit = false;
         while (!isExit) {
             try {
-                String input = sc.nextLine();
+                String input = ui.readCommand();
                 Command c = Parser.parse(input);
                 c.execute(tasks, ui);
+                isExit = c.isExit();
 
-                // Save automatically when task list changes (Level-7)
-                if (c instanceof AddTodoCommand
-                        || c instanceof AddDeadlineCommand
-                        || c instanceof AddEventCommand
-                        || c instanceof DeleteCommand
-                        || c instanceof MarkCommand
-                        || c instanceof UnmarkCommand) {
-                    try {
-                        storage.saveLines(tasks.toStorageLines());
-                    } catch (IOException e) {
-                        ui.showError("Could not save tasks: " + e.getMessage());
-                    }
+                // Save after every command (simple + safe)
+                // Storage already ensures ./data exists :contentReference{index=4}
+                try {
+                    storage.saveLines(tasks.toStorageLines());
+                } catch (IOException e) {
+                    ui.showError("Could not save to file. Your changes may not persist.");
                 }
 
-                isExit = c.isExit();
             } catch (NimbusException e) {
                 ui.showError(e.getMessage());
+            } finally {
+                // optional: visually separate turns
+                ui.showLine();
             }
         }
     }
+
+    public static void main(String[] args) {
+        new Nimbus("data/nimbus.txt").run();
+    }
 }
+
 
 
 
