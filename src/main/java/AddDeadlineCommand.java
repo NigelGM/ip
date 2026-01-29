@@ -1,17 +1,19 @@
+import java.time.LocalDateTime;
+
 public class AddDeadlineCommand implements Command {
     private final String description;
-    private final String by;
+    private final LocalDateTime by;
 
-    public AddDeadlineCommand(String description, String by) {
+    public AddDeadlineCommand(String description, LocalDateTime by) {
         this.description = description;
         this.by = by;
     }
 
     @Override
     public void execute(TaskList tasks, Ui ui) throws NimbusException {
-        Task t = new Deadline(description, by);
-        int size = tasks.add(t);
-        ui.showAdded(t, size);
+        Deadline d = new Deadline(description, by);
+        int size = tasks.add(d);
+        ui.showAdded(d, size);
     }
 
     @Override
@@ -19,3 +21,6 @@ public class AddDeadlineCommand implements Command {
         return false;
     }
 }
+
+
+
