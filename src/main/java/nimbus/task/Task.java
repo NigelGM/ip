@@ -1,3 +1,5 @@
+package nimbus.task;
+
 public abstract class Task {
     private final String description;
     private boolean isDone;
@@ -17,35 +19,42 @@ public abstract class Task {
         this.isDone = false;
     }
 
+    // ✅ use isDone()
     public String getStatusIcon() {
-        return isDone ? "X" : " ";
+        return isDone() ? "X" : " ";
     }
 
+    // ✅ use getType()
     public String getTypeIcon() {
-        return type.getIcon();
+        return getType().getIcon();
     }
+
+    // (this is the one IntelliJ warns about as "never used")
     public boolean isDone() {
         return isDone;
     }
 
+    // (warns "never used")
     public String getDescription() {
         return description;
     }
 
+    // (warns "never used")
     public TaskType getType() {
         return type;
     }
 
+    // ✅ use getType(), isDone(), getDescription()
     public String toStorageString() {
-        return type.getIcon() + " | " + (isDone ? "1" : "0") + " | " + description;
+        return getType().getIcon() + " | " + (isDone() ? "1" : "0") + " | " + getDescription();
     }
-
 
     @Override
     public String toString() {
-        return "[" + getTypeIcon() + "][" + getStatusIcon() + "] " + description;
+        return "[" + getTypeIcon() + "][" + getStatusIcon() + "] " + getDescription();
     }
 }
+
 
 
 

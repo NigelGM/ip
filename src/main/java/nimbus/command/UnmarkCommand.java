@@ -1,4 +1,11 @@
-public class UnmarkCommand implements Command {
+package nimbus.command;
+
+import nimbus.exception.NimbusException;
+import nimbus.task.Task;
+import nimbus.task.TaskList;
+import nimbus.ui.Ui;
+
+public class UnmarkCommand extends Command {
     private final int userIndex;
 
     public UnmarkCommand(int userIndex) {
@@ -17,3 +24,6 @@ public class UnmarkCommand implements Command {
         return false;
     }
 }
+
+
+

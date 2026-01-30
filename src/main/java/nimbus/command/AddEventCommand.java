@@ -1,6 +1,12 @@
-import java.time.LocalDateTime;
+package nimbus.command;
 
-public class AddEventCommand implements Command {
+import java.time.LocalDateTime;
+import nimbus.exception.NimbusException;
+import nimbus.ui.Ui;
+import nimbus.task.TaskList;
+import nimbus.task.Event;
+
+public class AddEventCommand extends Command {
     private final String description;
     private final LocalDateTime from;
     private final LocalDateTime to;
