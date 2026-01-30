@@ -1,4 +1,11 @@
-public class MarkCommand implements Command {
+package nimbus.command;
+
+import nimbus.exception.NimbusException;
+import nimbus.task.Task;
+import nimbus.task.TaskList;
+import nimbus.ui.Ui;
+
+public class MarkCommand extends Command {
     private final int userIndex;
 
     public MarkCommand(int userIndex) {
@@ -17,3 +24,5 @@ public class MarkCommand implements Command {
         return false;
     }
 }
+
+

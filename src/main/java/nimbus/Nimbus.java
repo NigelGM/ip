@@ -1,5 +1,14 @@
+package nimbus;
+
 import java.io.IOException;
 import java.util.List;
+
+import nimbus.command.Command;
+import nimbus.exception.NimbusException;
+import nimbus.parser.Parser;
+import nimbus.storage.Storage;
+import nimbus.task.TaskList;
+import nimbus.ui.Ui;
 
 public class Nimbus {
     private final Storage storage;
@@ -15,7 +24,6 @@ public class Nimbus {
             List<String> lines = storage.loadLines();
             loaded = new TaskList(lines);
         } catch (IOException e) {
-            // if file doesn't exist or can't be read, start fresh
             loaded = new TaskList();
             ui.showError("Could not load save file. Starting with an empty list.");
         }
@@ -33,8 +41,7 @@ public class Nimbus {
                 c.execute(tasks, ui);
                 isExit = c.isExit();
 
-                // Save after every command (simple + safe)
-                // Storage already ensures ./data exists :contentReference{index=4}
+                // Save after every command
                 try {
                     storage.saveLines(tasks.toStorageLines());
                 } catch (IOException e) {
@@ -44,7 +51,6 @@ public class Nimbus {
             } catch (NimbusException e) {
                 ui.showError(e.getMessage());
             } finally {
-                // optional: visually separate turns
                 ui.showLine();
             }
         }
@@ -54,6 +60,9 @@ public class Nimbus {
         new Nimbus("data/nimbus.txt").run();
     }
 }
+
+
+
 
 
 

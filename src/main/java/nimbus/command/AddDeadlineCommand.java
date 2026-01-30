@@ -1,6 +1,12 @@
-import java.time.LocalDateTime;
+package nimbus.command;
 
-public class AddDeadlineCommand implements Command {
+import java.time.LocalDateTime;
+import nimbus.task.TaskList;
+import nimbus.task.Deadline;
+import nimbus.ui.Ui;
+import nimbus.exception.NimbusException;
+
+public class AddDeadlineCommand extends Command {
     private final String description;
     private final LocalDateTime by;
 

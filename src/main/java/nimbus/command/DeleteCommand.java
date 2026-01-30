@@ -1,4 +1,11 @@
-public class DeleteCommand implements Command {
+package nimbus.command;
+
+import nimbus.task.TaskList;
+import nimbus.task.Task;
+import nimbus.exception.NimbusException;
+import nimbus.ui.Ui;
+
+public class DeleteCommand extends Command {
     private final int oneBasedIndex;
 
     public DeleteCommand(int oneBasedIndex) {

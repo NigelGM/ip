@@ -1,5 +1,10 @@
+package nimbus.ui;
+
 import java.util.Scanner;
 
+import nimbus.exception.NimbusException;
+import nimbus.task.Task;
+import nimbus.task.TaskList;
 // Ui.java
 public class Ui {
     private static final String LINE = "____________________________________________________________";

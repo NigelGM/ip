@@ -1,7 +1,11 @@
+package nimbus.task;
+
 import java.util.ArrayList;
 import java.util.List;
 
-// TaskList.java
+import nimbus.exception.NimbusException;
+import nimbus.parser.Parser;
+
 public class TaskList {
     private final ArrayList<Task> tasks;
 
@@ -9,18 +13,16 @@ public class TaskList {
         this.tasks = new ArrayList<>();
     }
 
-    // NEW: build tasks from saved lines
     public TaskList(List<String> storedLines) {
         this.tasks = new ArrayList<>();
         for (String line : storedLines) {
-            Task t = Parser.parseStoredTask(line); // returns null if corrupted
+            Task t = Parser.parseStoredTask(line);
             if (t != null) {
                 tasks.add(t);
             }
         }
     }
 
-    // NEW: convert tasks to lines to save
     public List<String> toStorageLines() {
         ArrayList<String> lines = new ArrayList<>();
         for (Task t : tasks) {
@@ -61,6 +63,7 @@ public class TaskList {
         return tasks.size();
     }
 }
+
 
 
 

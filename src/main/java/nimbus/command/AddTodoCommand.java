@@ -1,4 +1,12 @@
-public class AddTodoCommand implements Command {
+package nimbus.command;
+
+import nimbus.task.Task;
+import nimbus.exception.NimbusException;
+import nimbus.task.Todo;
+import nimbus.ui.Ui;
+import nimbus.task.TaskList;
+
+public class AddTodoCommand extends Command {
     private final String description;
 
     public AddTodoCommand(String description) {
