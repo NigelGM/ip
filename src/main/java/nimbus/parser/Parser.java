@@ -17,8 +17,28 @@ import nimbus.task.Event;
 import nimbus.task.Task;
 import nimbus.task.Todo;
 
+/**
+ * Parses raw user input strings into executable {@link Command} objects.
+ * <p>
+ * The input is expected to follow the Nimbus command format such as:
+ * <ul>
+ *   <li>{@code todo <description>}</li>
+ *   <li>{@code deadline <description> /by <yyyy-mm-ddTHH:mm>}</li>
+ *   <li>{@code event <description> /from <yyyy-mm-ddTHH:mm> /to <yyyy-mm-ddTHH:mm>}</li>
+ *   <li>{@code mark <taskNumber>}</li>
+ *   <li>{@code unmark <taskNumber>}</li>
+ *   <li>{@code delete <taskNumber>}</li>
+ * </ul>
+ */
 public class Parser {
 
+    /**
+     * Parses a full command line into a {@link Command}.
+     *
+     * @param fullCommand Raw user input line.
+     * @return A {@link Command} instance representing the user request.
+     * @throws NimbusException If the command is empty or invalid.
+     */
     public static Command parse(String fullCommand) throws NimbusException {
         String trimmed = fullCommand == null ? "" : fullCommand.trim();
         if (trimmed.isEmpty()) {
@@ -29,45 +49,40 @@ public class Parser {
         String commandWord = parts[0];
         String rest = parts.length > 1 ? parts[1].trim() : "";
 
-        switch (commandWord) {
-            case "bye":
-                return new ByeCommand();
+        return switch (commandWord) {
+            case "bye" -> new ByeCommand();
 
-            case "list":
-                return new ListCommand();
+            case "list" -> new ListCommand();
 
-            case "mark": {
-                int idx = parseOneBasedIndex(rest, "mark");
-                return new MarkCommand(idx);
-            }
+            case "mark" -> new MarkCommand(parseOneBasedIndex(rest, "mark"));
 
-            case "unmark": {
-                int idx = parseOneBasedIndex(rest, "unmark");
-                return new UnmarkCommand(idx);
-            }
+            case "unmark" -> new UnmarkCommand(parseOneBasedIndex(rest, "unmark"));
 
-            case "delete": {
-                int idx = parseOneBasedIndex(rest, "delete");
-                return new DeleteCommand(idx);
-            }
+            case "delete" -> new DeleteCommand(parseOneBasedIndex(rest, "delete"));
 
-            case "todo":
+            case "todo" -> {
                 if (rest.isEmpty()) {
                     throw new NimbusException("The description of a todo cannot be empty.");
                 }
-                return new AddTodoCommand(rest);
+                yield new AddTodoCommand(rest);
+            }
 
-            case "deadline":
-                return parseDeadline(rest);
+            case "deadline" -> parseDeadline(rest);
 
-            case "event":
-                return parseEvent(rest);
+            case "event" -> parseEvent(rest);
 
-            default:
-                throw new NimbusException("I'm sorry, but I don't know what that means.");
-        }
+            default -> throw new NimbusException("I'm sorry, but I don't know what that means.");
+        };
     }
 
+    /**
+     * Parses the task number (1-based) for commands that operate on an existing task.
+     *
+     * @param s The argument portion after the command word.
+     * @param cmd The command word (used for error messages).
+     * @return Parsed task number as an integer (1-based).
+     * @throws NimbusException If the argument is missing or not a valid positive integer.
+     */
     private static int parseOneBasedIndex(String s, String cmd) throws NimbusException {
         if (s == null || s.trim().isEmpty()) {
             throw new NimbusException("Please provide a task number for: " + cmd);
@@ -83,6 +98,14 @@ public class Parser {
         }
     }
 
+    /**
+     * Parses a {@code deadline} command of the form:
+     * {@code deadline <description> /by <yyyy-mm-ddTHH:mm>}
+     *
+     * @param rest Remainder after the command word.
+     * @return A {@link AddDeadlineCommand} constructed from the input.
+     * @throws NimbusException If the format is invalid or required parts are missing.
+     */
     private static Command parseDeadline(String rest) throws NimbusException {
         String[] split = rest.split("\\s*/by\\s*", 2);
         if (split.length < 2) {
@@ -98,6 +121,14 @@ public class Parser {
         return new AddDeadlineCommand(desc, by);
     }
 
+    /**
+     * Parses an {@code event} command of the form:
+     * {@code event <description> /from <yyyy-mm-ddTHH:mm> /to <yyyy-mm-ddTHH:mm>}
+     *
+     * @param rest Remainder after the command word.
+     * @return A {@link AddEventCommand} constructed from the input.
+     * @throws NimbusException If the format is invalid or required parts are missing.
+     */
     private static Command parseEvent(String rest) throws NimbusException {
         String[] splitFrom = rest.split("\\s*/from\\s*", 2);
         if (splitFrom.length < 2) {
@@ -121,7 +152,19 @@ public class Parser {
         return new AddEventCommand(desc, from, to);
     }
 
-    // Used by TaskList when loading from save file
+    /**
+     * Parses a saved task line from storage into a {@link Task} instance.
+     * <p>
+     * Expected formats:
+     * <ul>
+     *   <li>{@code T | 0 | borrow book}</li>
+     *   <li>{@code D | 1 | return book | 2019-12-02T18:00}</li>
+     *   <li>{@code E | 0 | meeting | 2019-12-02T14:00 | 2019-12-02T16:00}</li>
+     * </ul>
+     *
+     * @param line One line from the save file.
+     * @return A {@link Task} if parse succeeds, otherwise {@code null}.
+     */
     public static Task parseStoredTask(String line) {
         try {
             String[] parts = line.split("\\s*\\|\\s*");
