@@ -10,11 +10,23 @@ import nimbus.storage.Storage;
 import nimbus.task.TaskList;
 import nimbus.ui.Ui;
 
+/**
+ * Entry point and main runtime loop for the Nimbus task-tracking application.
+ * <p>
+ * Nimbus reads commands from the user via {@link Ui}, parses them into {@link Command}
+ * objects via {@link Parser}, executes them against the {@link TaskList}, and persists
+ * tasks using {@link Storage}.
+ */
 public class Nimbus {
     private final Storage storage;
     private final TaskList tasks;
     private final Ui ui;
 
+    /**
+     * Constructs a Nimbus instance and loads any previously saved tasks from the given file path.
+     *
+     * @param filePath Path to the save file (e.g. {@code "data/nimbus.txt"}).
+     */
     public Nimbus(String filePath) {
         this.ui = new Ui();
         this.storage = new Storage(filePath);
@@ -30,6 +42,11 @@ public class Nimbus {
         this.tasks = loaded;
     }
 
+    /**
+     * Runs the main application loop until an exit command is received.
+     * <p>
+     * Each iteration reads a command, parses it, executes it, and attempts to save.
+     */
     public void run() {
         ui.showGreeting();
 
@@ -56,6 +73,11 @@ public class Nimbus {
         }
     }
 
+    /**
+     * Launches the application with the default save file path.
+     *
+     * @param args Command-line arguments (unused).
+     */
     public static void main(String[] args) {
         new Nimbus("src/main/java/nimbus/data/nimbus.txt").run();
     }
