@@ -1,6 +1,7 @@
 package nimbus.ui;
 
 import java.util.Scanner;
+import java.util.List;
 
 import nimbus.exception.NimbusException;
 import nimbus.task.Task;
@@ -90,6 +91,22 @@ public class Ui {
         say("Noted. I've removed this task:");
         say("  " + task);
         say("Now you have " + size + " tasks in the list.");
+        printLine();
+    }
+
+    /**
+     * Shows results for the find command.
+     */
+    public void showFindResults(String keyword, List<Task> matches) {
+        printLine();
+        if (matches.isEmpty()) {
+            say("No matching tasks found for: \"" + keyword + "\"");
+        } else {
+            say("Here are the matching tasks in your list for \"" + keyword + "\":");
+            for (int i = 0; i < matches.size(); i++) {
+                say((i + 1) + ". " + matches.get(i));
+            }
+        }
         printLine();
     }
 }

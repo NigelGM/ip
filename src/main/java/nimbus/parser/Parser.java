@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import nimbus.command.AddDeadlineCommand;
 import nimbus.command.AddEventCommand;
 import nimbus.command.AddTodoCommand;
+import nimbus.command.FindCommand;
 import nimbus.command.ByeCommand;
 import nimbus.command.Command;
 import nimbus.command.DeleteCommand;
@@ -29,43 +30,37 @@ public class Parser {
         String commandWord = parts[0];
         String rest = parts.length > 1 ? parts[1].trim() : "";
 
-        switch (commandWord) {
-            case "bye":
-                return new ByeCommand();
+        return switch (commandWord) {
+            case "bye" -> new ByeCommand();
 
-            case "list":
-                return new ListCommand();
+            case "list" -> new ListCommand();
 
-            case "mark": {
-                int idx = parseOneBasedIndex(rest, "mark");
-                return new MarkCommand(idx);
+            case "mark" -> new MarkCommand(parseOneBasedIndex(rest, "mark"));
+
+            case "unmark" -> new UnmarkCommand(parseOneBasedIndex(rest, "unmark"));
+
+            case "delete" -> new DeleteCommand(parseOneBasedIndex(rest, "delete"));
+
+            case "find" -> {
+                if (rest.trim().isEmpty()) {
+                    throw new NimbusException("Usage: find <keyword>");
+                }
+                yield new FindCommand(rest.trim());
             }
 
-            case "unmark": {
-                int idx = parseOneBasedIndex(rest, "unmark");
-                return new UnmarkCommand(idx);
-            }
-
-            case "delete": {
-                int idx = parseOneBasedIndex(rest, "delete");
-                return new DeleteCommand(idx);
-            }
-
-            case "todo":
+            case "todo" -> {
                 if (rest.isEmpty()) {
                     throw new NimbusException("The description of a todo cannot be empty.");
                 }
-                return new AddTodoCommand(rest);
+                yield new AddTodoCommand(rest);
+            }
 
-            case "deadline":
-                return parseDeadline(rest);
+            case "deadline" -> parseDeadline(rest);
 
-            case "event":
-                return parseEvent(rest);
+            case "event" -> parseEvent(rest);
 
-            default:
-                throw new NimbusException("I'm sorry, but I don't know what that means.");
-        }
+            default -> throw new NimbusException("I'm sorry, but I don't know what that means.");
+        };
     }
 
     private static int parseOneBasedIndex(String s, String cmd) throws NimbusException {

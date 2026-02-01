@@ -57,7 +57,7 @@ public class Nimbus {
     }
 
     public static void main(String[] args) {
-        new Nimbus("data/nimbus.txt").run();
+        new Nimbus("src/main/java/nimbus/data/nimbus.txt").run();
     }
 }
 

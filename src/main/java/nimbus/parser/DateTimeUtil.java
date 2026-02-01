@@ -85,16 +85,6 @@ public class DateTimeUtil {
         return dt.format(OUTPUT_DATE_TIME);
     }
 
-    /**
-     * Useful helper: format date-only from a LocalDate.
-     */
-    public static String formatDate(LocalDate d) {
-        if (d == null) {
-            return "";
-        }
-        return d.format(OUTPUT_DATE);
-    }
-
     private DateTimeUtil() {
         // Utility class; no instances
     }

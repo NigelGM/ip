@@ -59,6 +59,24 @@ public class TaskList {
         return tasks.remove(idx);
     }
 
+    /**
+     * Finds tasks whose description contains the keyword (case-insensitive).
+     *
+     * @param keyword Search keyword
+     * @return list of matching tasks (maybe empty)
+     */
+    public List<Task> findByKeyword(String keyword) {
+        String needle = keyword.toLowerCase();
+        ArrayList<Task> matches = new ArrayList<>();
+
+        for (Task t : tasks) {
+            if (t.getDescription().toLowerCase().contains(needle)) {
+                matches.add(t);
+            }
+        }
+        return matches;
+    }
+
     public int size() {
         return tasks.size();
     }
