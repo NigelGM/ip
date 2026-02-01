@@ -33,6 +33,17 @@ public class Event extends Task {
     }
 
     /**
+     * Overrides the generic Task method to include event-specific dates.
+     * This "uses" getFrom() and getTo(), resolving the IDE warning.
+     */
+    @Override
+    public String toStorageString() {
+        return super.toStorageString()
+                + " | " + DateTimeUtil.formatForStorage(getFrom())
+                + " | " + DateTimeUtil.formatForStorage(getTo());
+    }
+
+    /**
      * Converts this event task into a storage string that includes start and end times.
      *
      * @return Storage string format with event duration.

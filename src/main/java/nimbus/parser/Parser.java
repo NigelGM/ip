@@ -56,7 +56,6 @@ public class Parser {
             case "list" -> new ListCommand();
 
             case "mark" -> new MarkCommand(parseOneBasedIndex(rest, "mark"));
-<<<<<<< HEAD
 
             case "unmark" -> new UnmarkCommand(parseOneBasedIndex(rest, "unmark"));
 
@@ -69,13 +68,6 @@ public class Parser {
                 yield new FindCommand(rest.trim());
             }
 
-=======
-
-            case "unmark" -> new UnmarkCommand(parseOneBasedIndex(rest, "unmark"));
-
-            case "delete" -> new DeleteCommand(parseOneBasedIndex(rest, "delete"));
-
->>>>>>> branch-A-JavaDoc
             case "todo" -> {
                 if (rest.isEmpty()) {
                     throw new NimbusException("The description of a todo cannot be empty.");

@@ -106,7 +106,6 @@ public class TaskList {
     }
 
     /**
-<<<<<<< HEAD
      * Finds tasks whose description contains the keyword (case-insensitive).
      *
      * @param keyword Search keyword
@@ -124,12 +123,11 @@ public class TaskList {
         return matches;
     }
 
-=======
+    /**
      * Returns the number of tasks in the list.
      *
      * @return List size.
      */
->>>>>>> branch-A-JavaDoc
     public int size() {
         return tasks.size();
     }

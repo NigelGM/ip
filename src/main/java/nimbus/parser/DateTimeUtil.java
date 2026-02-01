@@ -22,6 +22,10 @@ public class DateTimeUtil {
     private static final DateTimeFormatter INPUT_DATE =
             DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
+    // Add this for your Storage file
+    private static final DateTimeFormatter STORAGE_FORMATTER =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm");
+
     /** * Pattern for date and time user input: {@code yyyy-MM-dd HHmm} (e.g., 2019-12-02 1800).
      */
     private static final DateTimeFormatter INPUT_DATE_TIME =
@@ -112,15 +116,20 @@ public class DateTimeUtil {
         return dt.format(OUTPUT_DATE_TIME);
     }
 
-<<<<<<< HEAD
-=======
     /**
      * Private constructor to prevent instantiation of this utility class.
      */
->>>>>>> branch-A-JavaDoc
     private DateTimeUtil() {
         // Utility class; no instances
     }
+
+    /**
+     * This fixes the "Cannot resolve method" error.
+     */
+    public static String formatForStorage(LocalDateTime dateTime) {
+        return dateTime.format(STORAGE_FORMATTER);
+    }
+
 }
 
 

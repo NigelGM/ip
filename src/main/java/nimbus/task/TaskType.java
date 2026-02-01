@@ -32,20 +32,5 @@ public enum TaskType {
         return icon;
     }
 
-    /**
-     * Converts an icon string into a TaskType.
-     *
-     * @param icon Type icon string.
-     * @return Matching TaskType.
-     * @throws IllegalArgumentException If the icon does not match any known type.
-     */
-    public static TaskType fromIcon(String icon) {
-        for (TaskType t : TaskType.values()) {
-            if (t.icon.equals(icon)) {
-                return t;
-            }
-        }
-        throw new IllegalArgumentException("Unknown task type icon: " + icon);
-    }
 }
 

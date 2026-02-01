@@ -28,8 +28,4 @@ public class FindCommand extends Command {
         ui.showFindResults(keyword, matches);
     }
 
-    @Override
-    public boolean isExit() {
-        return false;
-    }
 }
