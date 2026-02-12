@@ -7,81 +7,113 @@ import nimbus.command.Command;
 import nimbus.exception.NimbusException;
 import nimbus.parser.Parser;
 import nimbus.storage.Storage;
+import nimbus.task.Task;
 import nimbus.task.TaskList;
 import nimbus.ui.Ui;
 
 /**
- * Entry point and main runtime loop for the Nimbus task-tracking application.
+ * Main logic class for Nimbus.
  * <p>
- * Nimbus reads commands from the user via {@link Ui}, parses them into {@link Command}
- * objects via {@link Parser}, executes them against the {@link TaskList}, and persists
- * tasks using {@link Storage}.
+ * In GUI mode (JavaFX), the UI calls {@link #getResponse(String)} for each user input.
+ * Nimbus returns the formatted response as a {@code String}.
  */
 public class Nimbus {
+
+    public static final String DEFAULT_FILE_PATH = "data/nimbus.txt";
+
     private final Storage storage;
     private final TaskList tasks;
     private final Ui ui;
 
+    private boolean isExit;
+
     /**
-     * Constructs a Nimbus instance and loads any previously saved tasks from the given file path.
+     * Creates Nimbus using the default save file path.
+     */
+    public Nimbus() {
+        this(DEFAULT_FILE_PATH);
+    }
+
+    /**
+     * Creates Nimbus using a custom save file path.
      *
-     * @param filePath Path to the save file (e.g. {@code "data/nimbus.txt"}).
+     * @param filePath path to save/load data
      */
     public Nimbus(String filePath) {
-        this.ui = new Ui();
+        this.ui = new Ui(false); // false = do not print to console, only buffer
         this.storage = new Storage(filePath);
+        this.tasks = new TaskList();
+        this.isExit = false;
 
-        TaskList loaded;
+        loadFromStorage();
+    }
+
+    /**
+     * Returns Nimbus greeting message for GUI.
+     *
+     * @return greeting message
+     */
+    public String getGreeting() {
+        ui.resetBuffer();
+        ui.showGreeting();
+        return ui.getBufferedOutput();
+    }
+
+    /**
+     * Processes a user input and returns Nimbus's response as a String.
+     * GUI should call this once per command.
+     *
+     * @param input user input
+     * @return Nimbus formatted response
+     */
+    public String getResponse(String input) {
+        ui.resetBuffer();
+
+        try {
+            Command c = Parser.parse(input);
+            c.execute(tasks, ui);
+
+            // Save after every command (safe and simple)
+            try {
+                storage.saveLines(tasks.toStorageLines());
+            } catch (IOException e) {
+                ui.showError("Could not save to file. Your changes may not persist.");
+            }
+
+            isExit = c.isExit();
+            return ui.getBufferedOutput();
+
+        } catch (NimbusException e) {
+            isExit = false;
+            ui.showError(e.getMessage());
+            return ui.getBufferedOutput();
+        }
+    }
+
+    /**
+     * Whether the last processed command requested to exit.
+     *
+     * @return true if app should exit, false otherwise
+     */
+    public boolean isExit() {
+        return isExit;
+    }
+
+    private void loadFromStorage() {
         try {
             List<String> lines = storage.loadLines();
-            loaded = new TaskList(lines);
-        } catch (IOException e) {
-            loaded = new TaskList();
-            ui.showError("Could not load save file. Starting with an empty list.");
-        }
-        this.tasks = loaded;
-    }
-
-    /**
-     * Runs the main application loop until an exit command is received.
-     * <p>
-     * Each iteration reads a command, parses it, executes it, and attempts to save.
-     */
-    public void run() {
-        ui.showGreeting();
-
-        boolean isExit = false;
-        while (!isExit) {
-            try {
-                String input = ui.readCommand();
-                Command c = Parser.parse(input);
-                c.execute(tasks, ui);
-                isExit = c.isExit();
-
-                // Save after every command
-                try {
-                    storage.saveLines(tasks.toStorageLines());
-                } catch (IOException e) {
-                    ui.showError("Could not save to file. Your changes may not persist.");
+            for (String line : lines) {
+                Task t = Parser.parseStoredTask(line);
+                if (t != null) {
+                    tasks.add(t);
                 }
-
-            } catch (NimbusException e) {
-                ui.showError(e.getMessage());
-            } finally {
-                ui.showLine();
             }
+        } catch (IOException e) {
+            // First run / no file yet -> start empty (no need to scare user)
         }
-    }
-
-    /**
-     * Launches the application with the default save file path.
-     *
-     * @param args Command-line arguments (unused).
-     */
-    public static void main(String[] args) {
-        new Nimbus("src/main/java/nimbus/data/nimbus.txt").run();
     }
 }
+
 
 
 
