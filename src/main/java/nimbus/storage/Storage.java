@@ -21,6 +21,7 @@ public class Storage {
      * @param filePath Path to the save file (e.g. {@code "data/nimbus.txt"}).
      */
     public Storage(String filePath) {
+        assert filePath != null && !filePath.isBlank() : "File path cannot be null or empty";
         this.path = Paths.get(filePath); // e.g. "data/duke.txt"
     }
 
@@ -31,6 +32,7 @@ public class Storage {
      * @throws IOException If reading from disk fails.
      */
     public List<String> loadLines() throws IOException {
+        assert path != null : "Storage path must be initialized";
         if (!Files.exists(path)) {
             return new ArrayList<>(); // first run, no file yet
         }
@@ -44,6 +46,7 @@ public class Storage {
      * @throws IOException If writing to disk fails.
      */
     public void saveLines(List<String> lines) throws IOException {
+        assert lines != null : "Cannot save a null list of lines";
         if (path.getParent() != null) {
             Files.createDirectories(path.getParent()); // ensure ./data exists
         }

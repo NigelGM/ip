@@ -29,6 +29,7 @@ public class TaskList {
      * @param storedLines Lines loaded from the save file.
      */
     public TaskList(List<String> storedLines) {
+        assert storedLines != null : "Input lines for storage cannot be null";
         this.tasks = new ArrayList<>();
         for (String line : storedLines) {
             Task t = Parser.parseStoredTask(line);
@@ -44,6 +45,7 @@ public class TaskList {
      * @return List of storage strings for all tasks.
      */
     public List<String> toStorageLines() {
+        assert tasks != null : "Tasks list must exist to convert to storage lines";
         ArrayList<String> lines = new ArrayList<>();
         for (Task t : tasks) {
             lines.add(t.toStorageString());
@@ -57,6 +59,7 @@ public class TaskList {
      * @return New size of the task list.
      */
     public int add(Task task) {
+        assert task != null : "Cannot add a null task to the list";
         tasks.add(task);
         return tasks.size();
     }
@@ -73,7 +76,9 @@ public class TaskList {
         if (idx < 0 || idx >= tasks.size()) {
             throw new NimbusException("Task number is out of range.");
         }
-        return tasks.get(idx);
+        Task t = tasks.get(idx);
+        assert t != null : "Task at valid index should not be null";
+        return t;
     }
 
     /**
@@ -87,7 +92,9 @@ public class TaskList {
         if (index < 0 || index >= tasks.size()) {
             throw new NimbusException("Task number is out of range.");
         }
-        return tasks.get(index);
+        Task t = tasks.get(index);
+        assert t != null : "Task at valid internal index should not be null";
+        return t;
     }
 
     /**
@@ -102,7 +109,10 @@ public class TaskList {
         if (idx < 0 || idx >= tasks.size()) {
             throw new NimbusException("Task number is out of range.");
         }
-        return tasks.remove(idx);
+        int oldSize = tasks.size();
+        Task removed = tasks.remove(idx);
+        assert tasks.size() == oldSize - 1 : "List size should decrease after deletion";
+        return removed;
     }
 
     /**
@@ -112,6 +122,7 @@ public class TaskList {
      * @return list of matching tasks (maybe empty)
      */
     public List<Task> findByKeyword(String keyword) {
+        assert keyword != null : "Search keyword cannot be null";
         String needle = keyword.toLowerCase();
         ArrayList<Task> matches = new ArrayList<>();
 

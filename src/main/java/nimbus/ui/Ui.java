@@ -11,8 +11,8 @@ import nimbus.task.TaskList;
  * <p>
  * Supports two modes:
  * <ul>
- *   <li>Console printing (optional)</li>
- *   <li>Buffering output as a String (for JavaFX GUI)</li>
+ * <li>Console printing (optional)</li>
+ * <li>Buffering output as a String (for JavaFX GUI)</li>
  * </ul>
  */
 public class Ui {
@@ -53,6 +53,7 @@ public class Ui {
     }
 
     private void out(String s) {
+        assert s != null : "Cannot output a null string";
         if (printToConsole) {
             System.out.println(s);
         }
@@ -69,6 +70,7 @@ public class Ui {
     }
 
     public void showError(String message) {
+        assert message != null : "Error message should not be null";
         say(message);
     }
 
@@ -77,12 +79,14 @@ public class Ui {
     }
 
     public void showAdded(Task task, int size) {
+        assert task != null : "Added task cannot be null";
         say("Got it. I've added this task:");
         say("  " + task);
         say("Now you have " + size + " tasks in the list.");
     }
 
     public void showList(TaskList tasks) {
+        assert tasks != null : "TaskList to display cannot be null";
         say("Here are the tasks in your list:");
         for (int i = 0; i < tasks.size(); i++) {
             try {
@@ -95,23 +99,28 @@ public class Ui {
     }
 
     public void showMarked(Task task) {
+        assert task != null : "Marked task cannot be null";
         say("Nice! I've marked this task as done:");
         say("  " + task);
     }
 
     public void showUnmarked(Task task) {
+        assert task != null : "Unmarked task cannot be null";
         say("OK, I've marked this task as not done yet:");
         say("  " + task);
     }
 
     public void showDeleted(Task task, int size) {
+        assert task != null : "Deleted task cannot be null";
         say("Noted. I've removed this task:");
         say("  " + task);
         say("Now you have " + size + " tasks in the list.");
     }
 
     public void showFindResults(String keyword, List<Task> matches) {
-        if (matches == null || matches.isEmpty()) {
+        assert keyword != null : "Search keyword for find results cannot be null";
+        assert matches != null : "Match list for find results cannot be null";
+        if (matches.isEmpty()) {
             say("No matching tasks found for \"" + keyword + "\".");
         } else {
             say("Here are the matching tasks in your list for \"" + keyword + "\":");
