@@ -1,82 +1,72 @@
 package nimbus.ui;
 
+import java.net.URL;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
 import nimbus.Nimbus;
-import java.io.InputStream;
 
-/**
- * Controller for the main GUI.
- */
 public class MainWindow {
-
     @FXML
     private ScrollPane scrollPane;
     @FXML
     private VBox dialogContainer;
     @FXML
     private TextField userInput;
+    @FXML
+    private Button sendButton;
 
     private Nimbus nimbus;
-
     private Image userImage;
-    private Image botImage;
+    private Image nimbusImage;
 
-    /**
-     * Initializes the UI components after FXML is loaded.
-     */
     @FXML
     public void initialize() {
-        // Automatically scrolls to the bottom when the dialog container height changes
         scrollPane.vvalueProperty().bind(dialogContainer.heightProperty());
+        sendButton.setDefaultButton(true);
+
+        userImage = loadImageOrNull("/image/user.png");
+        nimbusImage = loadImageOrNull("/image/nimbus.png");
     }
 
-    /**
-     * Injects Nimbus logic into this controller.
-     *
-     * @param nimbus Nimbus app logic.
-     */
     public void setNimbus(Nimbus nimbus) {
         this.nimbus = nimbus;
-
-        // Load images using safe resource streams to prevent NullPointerExceptions
-        InputStream userStream = MainWindow.class.getResourceAsStream("/image/user.png");
-        InputStream botStream = MainWindow.class.getResourceAsStream("/image/nimbus.png");
-
-        // Use assertions to verify file paths exist during development
-        assert userStream != null : "User image not found! Check src/main/resources/image/user.png";
-        assert botStream != null : "Bot image not found! Check src/main/resources/image/nimbus.png";
-
-        userImage = new Image(userStream);
-        botImage = new Image(botStream);
-
-        // Display the initial welcome message
-        dialogContainer.getChildren().add(
-                DialogBox.getBotDialog("Hello! I'm Nimbus \nWhat can I do for you?", botImage)
-        );
+        // Greet the user on startup
+        dialogContainer.getChildren().add(DialogBox.getNimbusDialog(nimbus.getGreeting(), nimbusImage));
     }
 
-    /**
-     * Handles user input when Enter is pressed.
-     */
     @FXML
     private void handleUserInput() {
-        String input = userInput.getText().trim(); // Trim to handle accidental spacing
-        if (input.isEmpty()) {
-            return;
-        }
+        if (nimbus == null) return;
 
+        String input = userInput.getText();
+        if (input == null || input.trim().isEmpty()) return;
+
+        dialogContainer.getChildren().add(DialogBox.getUserDialog(input, userImage));
         String response = nimbus.getResponse(input);
-
-        dialogContainer.getChildren().addAll(
-                DialogBox.getUserDialog(input, userImage),
-                DialogBox.getBotDialog(response, botImage)
-        );
+        dialogContainer.getChildren().add(DialogBox.getNimbusDialog(response, nimbusImage));
 
         userInput.clear();
+
+        if (nimbus.isExit()) {
+            Platform.runLater(Platform::exit);
+        }
+    }
+
+    private static Image loadImageOrNull(String classpathResource) {
+        URL url = MainWindow.class.getResource(classpathResource);
+        if (url == null) return null;
+        try {
+            return new Image(url.toExternalForm());
+        } catch (Exception e) {
+            return null;
+        }
     }
 }
+
+
 
