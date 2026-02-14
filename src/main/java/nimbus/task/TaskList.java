@@ -29,6 +29,7 @@ public class TaskList {
      * @param storedLines Lines loaded from the save file.
      */
     public TaskList(List<String> storedLines) {
+        assert storedLines != null;
         this.tasks = new ArrayList<>();
         for (String line : storedLines) {
             Task t = Parser.parseStoredTask(line);
@@ -44,12 +45,14 @@ public class TaskList {
      * @return List of storage strings for all tasks.
      */
     public List<String> toStorageLines() {
+        assert tasks != null;
         ArrayList<String> lines = new ArrayList<>();
         for (Task t : tasks) {
             lines.add(t.toStorageString());
         }
         return lines;
     }
+
     /**
      * Adds a task into the list.
      *
@@ -57,6 +60,7 @@ public class TaskList {
      * @return New size of the task list.
      */
     public int add(Task task) {
+        assert task != null;
         tasks.add(task);
         return tasks.size();
     }
@@ -70,9 +74,7 @@ public class TaskList {
      */
     public Task get(int oneBasedIndex) throws NimbusException {
         int idx = oneBasedIndex - 1;
-        if (idx < 0 || idx >= tasks.size()) {
-            throw new NimbusException("Task number is out of range.");
-        }
+        validateIndex(idx);
         return tasks.get(idx);
     }
 
@@ -84,10 +86,17 @@ public class TaskList {
      * @throws NimbusException If index is out of range.
      */
     public Task getByZeroBasedIndex(int index) throws NimbusException {
+        validateIndex(index);
+        return tasks.get(index);
+    }
+
+    /**
+     * Validates that the index is within the bounds of the task list.
+     */
+    private void validateIndex(int index) throws NimbusException {
         if (index < 0 || index >= tasks.size()) {
             throw new NimbusException("Task number is out of range.");
         }
-        return tasks.get(index);
     }
 
     /**
@@ -99,22 +108,25 @@ public class TaskList {
      */
     public Task delete(int oneBasedIndex) throws NimbusException {
         int idx = oneBasedIndex - 1;
-        if (idx < 0 || idx >= tasks.size()) {
-            throw new NimbusException("Task number is out of range.");
-        }
+        validateIndex(idx);
         return tasks.remove(idx);
     }
 
     /**
      * Finds tasks whose description contains the keyword (case-insensitive).
+     * Uses a guard clause for better code quality.
      *
      * @param keyword Search keyword
      * @return list of matching tasks (maybe empty)
      */
     public List<Task> findByKeyword(String keyword) {
+        assert keyword != null;
+        if (keyword.isBlank()) {
+            return new ArrayList<>();
+        }
+
         String needle = keyword.toLowerCase();
         ArrayList<Task> matches = new ArrayList<>();
-
         for (Task t : tasks) {
             if (t.getDescription().toLowerCase().contains(needle)) {
                 matches.add(t);

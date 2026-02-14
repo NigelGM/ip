@@ -11,8 +11,8 @@ import nimbus.task.TaskList;
  * <p>
  * Supports two modes:
  * <ul>
- *   <li>Console printing (optional)</li>
- *   <li>Buffering output as a String (for JavaFX GUI)</li>
+ * <li>Console printing (optional)</li>
+ * <li>Buffering output as a String (for JavaFX GUI)</li>
  * </ul>
  */
 public class Ui {
@@ -53,6 +53,7 @@ public class Ui {
     }
 
     private void out(String s) {
+        assert s != null : "Cannot output a null string";
         if (printToConsole) {
             System.out.println(s);
         }
@@ -69,6 +70,7 @@ public class Ui {
     }
 
     public void showError(String message) {
+        assert message != null : "Error message should not be null";
         say(message);
     }
 
@@ -77,47 +79,69 @@ public class Ui {
     }
 
     public void showAdded(Task task, int size) {
+        assert task != null : "Added task cannot be null";
         say("Got it. I've added this task:");
         say("  " + task);
         say("Now you have " + size + " tasks in the list.");
     }
 
+    /**
+     * Displays the full list of tasks in your list.
+     * Follows SLAP by delegating individual line formatting to a helper.
+     *
+     * @param tasks The task list to be displayed.
+     */
     public void showList(TaskList tasks) {
+        assert tasks != null : "TaskList to display cannot be null";
         say("Here are the tasks in your list:");
         for (int i = 0; i < tasks.size(); i++) {
-            try {
-                say((i + 1) + ". " + tasks.getByZeroBasedIndex(i));
-            } catch (NimbusException e) {
-                // should not happen, but safe
-                say("Error displaying task " + (i + 1) + ": " + e.getMessage());
-            }
+            displayTaskAt(tasks, i);
+        }
+    }
+
+    /**
+     * Formats and displays a single task at the given index.
+     * This keeps the abstraction level of showList consistent.
+     */
+    private void displayTaskAt(TaskList tasks, int index) {
+        try {
+            say((index + 1) + ". " + tasks.getByZeroBasedIndex(index));
+        } catch (NimbusException e) {
+            say("Error displaying task " + (index + 1) + ": " + e.getMessage());
         }
     }
 
     public void showMarked(Task task) {
+        assert task != null : "Marked task cannot be null";
         say("Nice! I've marked this task as done:");
         say("  " + task);
     }
 
     public void showUnmarked(Task task) {
+        assert task != null : "Unmarked task cannot be null";
         say("OK, I've marked this task as not done yet:");
         say("  " + task);
     }
 
     public void showDeleted(Task task, int size) {
+        assert task != null : "Deleted task cannot be null";
         say("Noted. I've removed this task:");
         say("  " + task);
         say("Now you have " + size + " tasks in the list.");
     }
 
     public void showFindResults(String keyword, List<Task> matches) {
-        if (matches == null || matches.isEmpty()) {
+        assert keyword != null : "Search keyword cannot be null";
+        assert matches != null : "Match list cannot be null";
+
+        if (matches.isEmpty()) {
             say("No matching tasks found for \"" + keyword + "\".");
-        } else {
-            say("Here are the matching tasks in your list for \"" + keyword + "\":");
-            for (int i = 0; i < matches.size(); i++) {
-                say((i + 1) + ". " + matches.get(i));
-            }
+            return;
+        }
+
+        say("Here are the matching tasks in your list for \"" + keyword + "\":");
+        for (int i = 0; i < matches.size(); i++) {
+            say((i + 1) + ". " + matches.get(i));
         }
     }
 }

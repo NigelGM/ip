@@ -19,6 +19,13 @@ import javafx.scene.shape.Circle;
  * A custom control using FXML that represents a message bubble in the chat.
  */
 public class DialogBox extends HBox {
+
+    // Extracted magic strings into constants for better maintainability
+    private static final String USER_BUBBLE_STYLE = "-fx-background-color: #0084FF; "
+            + "-fx-text-fill: white; -fx-background-radius: 15; -fx-padding: 10;";
+    private static final String NIMBUS_BUBBLE_STYLE = "-fx-background-color: #F0F0F0; "
+            + "-fx-text-fill: black; -fx-background-radius: 15; -fx-padding: 10;";
+
     @FXML
     private Label dialog;
 
@@ -27,8 +34,6 @@ public class DialogBox extends HBox {
 
     /**
      * Private constructor for the DialogBox.
-     * The use of 'this.dialog' and 'this.displayPicture' here signals to the IDE
-     * that the variables are being accessed and used.
      */
     private DialogBox(String text, Image img, String bubbleStyle) {
         try {
@@ -37,16 +42,13 @@ public class DialogBox extends HBox {
             fxmlLoader.setRoot(this);
             fxmlLoader.load();
         } catch (IOException e) {
-            // Robust error handling replacing printStackTrace
             throw new RuntimeException("Critical failure loading DialogBox FXML", e);
         }
 
-        // Using the private variables here
         dialog.setText(text);
         displayPicture.setImage(img);
         dialog.setStyle(bubbleStyle);
 
-        // Circular avatar crop for a modern look
         Circle clip = new Circle(25, 25, 25);
         displayPicture.setClip(clip);
     }
@@ -58,16 +60,18 @@ public class DialogBox extends HBox {
         setAlignment(Pos.TOP_LEFT);
     }
 
+    /**
+     * Creates a user dialog box with the specified text and image.
+     */
     public static DialogBox getUserDialog(String text, Image img) {
-        String style = "-fx-background-color: #0084FF; -fx-text-fill: white; "
-                + "-fx-background-radius: 15; -fx-padding: 10;";
-        return new DialogBox(text, img, style);
+        return new DialogBox(text, img, USER_BUBBLE_STYLE);
     }
 
+    /**
+     * Creates a Nimbus dialog box with the specified text and image.
+     */
     public static DialogBox getNimbusDialog(String text, Image img) {
-        String style = "-fx-background-color: #F0F0F0; -fx-text-fill: black; "
-                + "-fx-background-radius: 15; -fx-padding: 10;";
-        var db = new DialogBox(text, img, style);
+        var db = new DialogBox(text, img, NIMBUS_BUBBLE_STYLE);
         db.flip();
         return db;
     }
