@@ -2,7 +2,6 @@ package nimbus.ui;
 
 import java.io.IOException;
 import java.util.Collections;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -15,27 +14,15 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.shape.Circle;
 
-/**
- * A custom control using FXML that represents a message bubble in the chat.
- */
 public class DialogBox extends HBox {
-
-    // Extracted magic strings into constants for better maintainability
-    private static final String USER_BUBBLE_STYLE = "-fx-background-color: #0084FF; "
-            + "-fx-text-fill: white; -fx-background-radius: 15; -fx-padding: 10;";
-    private static final String NIMBUS_BUBBLE_STYLE = "-fx-background-color: #F0F0F0; "
-            + "-fx-text-fill: black; -fx-background-radius: 15; -fx-padding: 10;";
 
     @FXML
     private Label dialog;
-
     @FXML
     private ImageView displayPicture;
 
-    /**
-     * Private constructor for the DialogBox.
-     */
-    private DialogBox(String text, Image img, String bubbleStyle) {
+    // Use CSS classes instead of hardcoded strings
+    private DialogBox(String text, Image img, String styleClass) {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(MainWindow.class.getResource("/view/DialogBox.fxml"));
             fxmlLoader.setController(this);
@@ -47,7 +34,10 @@ public class DialogBox extends HBox {
 
         dialog.setText(text);
         displayPicture.setImage(img);
-        dialog.setStyle(bubbleStyle);
+
+        // Code Quality: Add CSS class instead of setting inline style
+        dialog.getStyleClass().add(styleClass);
+        this.getStyleClass().add("dialog-box"); // Adds padding/spacing from CSS
 
         Circle clip = new Circle(25, 25, 25);
         displayPicture.setClip(clip);
@@ -60,18 +50,13 @@ public class DialogBox extends HBox {
         setAlignment(Pos.TOP_LEFT);
     }
 
-    /**
-     * Creates a user dialog box with the specified text and image.
-     */
     public static DialogBox getUserDialog(String text, Image img) {
-        return new DialogBox(text, img, USER_BUBBLE_STYLE);
+        // Pass the CSS class name "user-label"
+        return new DialogBox(text, img, "user-label");
     }
 
-    /**
-     * Creates a Nimbus dialog box with the specified text and image.
-     */
     public static DialogBox getNimbusDialog(String text, Image img) {
-        var db = new DialogBox(text, img, NIMBUS_BUBBLE_STYLE);
+        var db = new DialogBox(text, img, "nimbus-label");
         db.flip();
         return db;
     }

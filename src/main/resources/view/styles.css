@@ -1,0 +1,45 @@
+/* nimbus.css or styles.css */
+
+/* 1. The Main Window Background */
+.root {
+    -fx-background-image: url("../image/clouds.jpg");
+    -fx-background-position: center center;
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: cover;
+}
+
+/* 2. Make the ScrollPane transparent so the background shows through */
+.scroll-pane {
+    -fx-background: transparent;
+    -fx-background-color: transparent;
+}
+
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+/* 3. The container for chat bubbles must also be transparent */
+#dialogContainer {
+    -fx-background-color: transparent;
+}
+
+/* 4. Chat Bubble Styles (Moved from DialogBox.java) */
+.dialog-box {
+    -fx-padding: 10px;
+    -fx-background-radius: 15px;
+    -fx-spacing: 10px;
+}
+
+.user-label {
+    -fx-background-color: #0084FF;
+    -fx-text-fill: white;
+    -fx-label-padding: 5px;
+    -fx-background-radius: 15px;
+}
+
+.nimbus-label {
+    -fx-background-color: #F0F0F0;
+    -fx-text-fill: black;
+    -fx-label-padding: 5px;
+    -fx-background-radius: 15px;
+}
