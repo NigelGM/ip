@@ -2,6 +2,7 @@ package nimbus.task;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import nimbus.exception.NimbusException;
 import nimbus.parser.Parser;
@@ -10,7 +11,7 @@ import nimbus.parser.Parser;
  * Represents an in-memory list of {@link Task} objects.
  * <p>
  * Provides basic operations such as add, delete, retrieval, and conversion into
- * storage-friendly lines.
+ * storage-friendly lines using Java Streams.
  */
 public class TaskList {
     private final ArrayList<Task> tasks;
@@ -30,28 +31,24 @@ public class TaskList {
      */
     public TaskList(List<String> storedLines) {
         assert storedLines != null : "Input lines for storage cannot be null";
-        this.tasks = new ArrayList<>();
-        for (String line : storedLines) {
-            Task t = Parser.parseStoredTask(line);
-            if (t != null) {
-                tasks.add(t);
-            }
-        }
+        this.tasks = storedLines.stream()
+                .map(Parser::parseStoredTask)
+                .filter(java.util.Objects::nonNull)
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     /**
-     * Converts all tasks into save-file lines.
+     * Converts all tasks into save-file lines using Java Streams.
      *
      * @return List of storage strings for all tasks.
      */
     public List<String> toStorageLines() {
         assert tasks != null : "Tasks list must exist to convert to storage lines";
-        ArrayList<String> lines = new ArrayList<>();
-        for (Task t : tasks) {
-            lines.add(t.toStorageString());
-        }
-        return lines;
+        return tasks.stream()
+                .map(Task::toStorageString)
+                .collect(Collectors.toList());
     }
+
     /**
      * Adds a task into the list.
      *
@@ -116,22 +113,17 @@ public class TaskList {
     }
 
     /**
-     * Finds tasks whose description contains the keyword (case-insensitive).
+     * Finds tasks whose description contains the keyword using Java Streams.
      *
-     * @param keyword Search keyword
-     * @return list of matching tasks (maybe empty)
+     * @param keyword Search keyword.
+     * @return List of matching tasks (perhaps empty).
      */
     public List<Task> findByKeyword(String keyword) {
         assert keyword != null : "Search keyword cannot be null";
         String needle = keyword.toLowerCase();
-        ArrayList<Task> matches = new ArrayList<>();
-
-        for (Task t : tasks) {
-            if (t.getDescription().toLowerCase().contains(needle)) {
-                matches.add(t);
-            }
-        }
-        return matches;
+        return tasks.stream()
+                .filter(t -> t.getDescription().toLowerCase().contains(needle))
+                .collect(Collectors.toList());
     }
 
     /**
