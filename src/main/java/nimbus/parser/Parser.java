@@ -248,7 +248,7 @@ public class Parser {
             };
 
             if (task != null && isDone) {
-                task.markDone();
+                task.markAsDone();
             }
             return task;
 

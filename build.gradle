@@ -46,3 +46,7 @@ shadowJar {
     archiveBaseName = "nimbus"
     archiveClassifier = null
 }
+
+run {
+    enableAssertions = true
+}
