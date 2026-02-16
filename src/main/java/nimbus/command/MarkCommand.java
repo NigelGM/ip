@@ -25,13 +25,15 @@ public class MarkCommand extends Command {
      *
      * @param tasks The task list containing the task.
      * @param ui    The UI used to show feedback.
+     * @return
      * @throws NimbusException If the index is invalid.
      */
     @Override
-    public void execute(TaskList tasks, Ui ui) throws NimbusException {
+    public String execute(TaskList tasks, Ui ui) throws NimbusException {
         // Refactored for SLAP: TaskList now handles the internal marking logic
         Task t = tasks.markTaskAsDone(userIndex);
         ui.showMarked(t);
+        return null;
     }
 }
 

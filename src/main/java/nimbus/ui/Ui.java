@@ -85,29 +85,16 @@ public class Ui {
         say("Now you have " + size + " tasks in the list.");
     }
 
-    /**
-     * Displays the full list of tasks in your list.
-     * Follows SLAP by delegating individual line formatting to a helper.
-     *
-     * @param tasks The task list to be displayed.
-     */
     public void showList(TaskList tasks) {
         assert tasks != null : "TaskList to display cannot be null";
         say("Here are the tasks in your list:");
         for (int i = 0; i < tasks.size(); i++) {
-            displayTaskAt(tasks, i);
-        }
-    }
-
-    /**
-     * Formats and displays a single task at the given index.
-     * This keeps the abstraction level of showList consistent.
-     */
-    private void displayTaskAt(TaskList tasks, int index) {
-        try {
-            say((index + 1) + ". " + tasks.getByZeroBasedIndex(index));
-        } catch (NimbusException e) {
-            say("Error displaying task " + (index + 1) + ": " + e.getMessage());
+            try {
+                say((i + 1) + ". " + tasks.getByZeroBasedIndex(i));
+            } catch (NimbusException e) {
+                // should not happen, but safe
+                say("Error displaying task " + (i + 1) + ": " + e.getMessage());
+            }
         }
     }
 
@@ -131,18 +118,23 @@ public class Ui {
     }
 
     public void showFindResults(String keyword, List<Task> matches) {
-        assert keyword != null : "Search keyword cannot be null";
-        assert matches != null : "Match list cannot be null";
-
+        assert keyword != null : "Search keyword for find results cannot be null";
+        assert matches != null : "Match list for find results cannot be null";
         if (matches.isEmpty()) {
             say("No matching tasks found for \"" + keyword + "\".");
-            return;
+        } else {
+            say("Here are the matching tasks in your list for \"" + keyword + "\":");
+            for (int i = 0; i < matches.size(); i++) {
+                say((i + 1) + ". " + matches.get(i));
+            }
         }
+    }
 
-        say("Here are the matching tasks in your list for \"" + keyword + "\":");
-        for (int i = 0; i < matches.size(); i++) {
-            say((i + 1) + ". " + matches.get(i));
-        }
+    /**
+     * Displays an error message when the storage file fails to load.
+     */
+    public void showLoadingError() {
+        System.out.println("Error: Could not load tasks from storage. Starting with an empty list.");
     }
 }
 

@@ -23,9 +23,10 @@ public class FindCommand extends Command {
     }
 
     @Override
-    public void execute(TaskList tasks, Ui ui) throws NimbusException {
+    public String execute(TaskList tasks, Ui ui) throws NimbusException {
         List<Task> matches = tasks.findByKeyword(keyword);
         ui.showFindResults(keyword, matches);
+        return null;
     }
 
 }

@@ -13,10 +13,11 @@ public abstract class Command {
      * Executes the command.
      *
      * @param tasks task list to operate on
-     * @param ui ui to show messages
+     * @param ui    ui to show messages
+     * @return
      * @throws NimbusException if command execution fails
      */
-    public abstract void execute(TaskList tasks, Ui ui) throws NimbusException;
+    public abstract String execute(TaskList tasks, Ui ui) throws NimbusException;
 
     /**
      * Returns whether this command signals the program to exit.

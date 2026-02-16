@@ -13,10 +13,12 @@ public class ByeCommand extends Command {
      *
      * @param tasks The task list (not used by this command).
      * @param ui    The UI used to show the goodbye message.
+     * @return
      */
     @Override
-    public void execute(TaskList tasks, Ui ui) {
+    public String execute(TaskList tasks, Ui ui) {
         ui.showBye();
+        return null;
     }
 
     /**

@@ -32,10 +32,11 @@ public class AddEventCommand extends Command {
      *
      * @param tasks The task list to add into.
      * @param ui    The UI used to show feedback.
+     * @return
      * @throws NimbusException If the task cannot be added.
      */
     @Override
-    public void execute(TaskList tasks, Ui ui) throws NimbusException {
+    public String execute(TaskList tasks, Ui ui) throws NimbusException {
         // Guard Clause: Ensure logical consistency before proceeding
         if (to.isBefore(from)) {
             throw new NimbusException("The end time cannot be before the start time!");
@@ -44,6 +45,7 @@ public class AddEventCommand extends Command {
         Event e = new Event(description, from, to);
         int size = tasks.add(e);
         ui.showAdded(e, size);
+        return null;
     }
 }
 

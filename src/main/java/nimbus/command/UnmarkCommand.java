@@ -25,13 +25,15 @@ public class UnmarkCommand extends Command {
      *
      * @param tasks The task list containing the task.
      * @param ui    The UI used to show feedback.
+     * @return
      * @throws NimbusException If the index is invalid.
      */
     @Override
-    public void execute(TaskList tasks, Ui ui) throws NimbusException {
+    public String execute(TaskList tasks, Ui ui) throws NimbusException {
         // Refactored for SLAP: TaskList now handles the internal unmarking logic
         Task t = tasks.unmarkTask(userIndex);
         ui.showUnmarked(t);
+        return null;
     }
 }
 

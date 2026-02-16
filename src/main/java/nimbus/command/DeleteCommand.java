@@ -25,13 +25,15 @@ public class DeleteCommand extends Command {
      *
      * @param tasks The task list containing the task.
      * @param ui    The UI used to show feedback.
+     * @return
      * @throws NimbusException If the index is invalid.
      */
     @Override
-    public void execute(TaskList tasks, Ui ui) throws NimbusException {
+    public String execute(TaskList tasks, Ui ui) throws NimbusException {
         // High-level: Just tell the list to delete and the UI to show it
         Task removed = tasks.deleteTask(oneBasedIndex);
         ui.showDeleted(removed, tasks.size());
+        return null;
     }
 }
 

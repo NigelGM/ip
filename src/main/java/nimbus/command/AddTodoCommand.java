@@ -26,13 +26,15 @@ public class AddTodoCommand extends Command {
      *
      * @param tasks The task list to add into.
      * @param ui    The UI used to show feedback.
+     * @return
      * @throws NimbusException If the task cannot be added.
      */
     @Override
-    public void execute(TaskList tasks, Ui ui) throws NimbusException {
+    public String execute(TaskList tasks, Ui ui) throws NimbusException {
         Task t = new Todo(description);
         int size = tasks.add(t);
         ui.showAdded(t, size);
+        return null;
     }
 
 }
