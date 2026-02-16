@@ -100,19 +100,6 @@ public class TaskList {
     }
 
     /**
-     * Deletes a task by one-based index.
-     *
-     * @param oneBasedIndex One-based index (1 to size).
-     * @return The removed task.
-     * @throws NimbusException If index is out of range.
-     */
-    public Task delete(int oneBasedIndex) throws NimbusException {
-        int idx = oneBasedIndex - 1;
-        validateIndex(idx);
-        return tasks.remove(idx);
-    }
-
-    /**
      * Finds tasks whose description contains the keyword (case-insensitive).
      * Uses a guard clause for better code quality.
      *
@@ -133,6 +120,49 @@ public class TaskList {
             }
         }
         return matches;
+    }
+
+    /**
+     * Marks a task as done by its one-based index.
+     *
+     * @param oneBasedIndex One-based index (1 to size).
+     * @return The task that was marked.
+     * @throws NimbusException If the index is out of range.
+     */
+    public Task markTaskAsDone(int oneBasedIndex) throws NimbusException {
+        int idx = oneBasedIndex - 1;
+        validateIndex(idx);
+        Task t = tasks.get(idx);
+        t.markDone();
+        return t;
+    }
+
+    /**
+     * Marks a task as not done by its one-based index.
+     *
+     * @param oneBasedIndex One-based index (1 to size).
+     * @return The task that was unmarked.
+     * @throws NimbusException If the index is out of range.
+     */
+    public Task unmarkTask(int oneBasedIndex) throws NimbusException {
+        int idx = oneBasedIndex - 1;
+        validateIndex(idx);
+        Task t = tasks.get(idx);
+        t.unmark();
+        return t;
+    }
+
+    /**
+     * Deletes a task from the list by its one-based index.
+     *
+     * @param oneBasedIndex One-based index (1 to size).
+     * @return The removed task.
+     * @throws NimbusException If the index is out of range.
+     */
+    public Task deleteTask(int oneBasedIndex) throws NimbusException {
+        int idx = oneBasedIndex - 1;
+        validateIndex(idx);
+        return tasks.remove(idx);
     }
 
     /**

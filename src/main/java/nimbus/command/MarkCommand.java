@@ -29,11 +29,10 @@ public class MarkCommand extends Command {
      */
     @Override
     public void execute(TaskList tasks, Ui ui) throws NimbusException {
-        Task t = tasks.get(userIndex);
-        t.markDone();
+        // Refactored for SLAP: TaskList now handles the internal marking logic
+        Task t = tasks.markTaskAsDone(userIndex);
         ui.showMarked(t);
     }
-
 }
 
 

@@ -36,10 +36,14 @@ public class AddEventCommand extends Command {
      */
     @Override
     public void execute(TaskList tasks, Ui ui) throws NimbusException {
+        // Guard Clause: Ensure logical consistency before proceeding
+        if (to.isBefore(from)) {
+            throw new NimbusException("The end time cannot be before the start time!");
+        }
+
         Event e = new Event(description, from, to);
         int size = tasks.add(e);
         ui.showAdded(e, size);
     }
 }
-
 

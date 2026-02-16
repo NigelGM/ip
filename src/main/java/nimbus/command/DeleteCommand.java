@@ -29,10 +29,10 @@ public class DeleteCommand extends Command {
      */
     @Override
     public void execute(TaskList tasks, Ui ui) throws NimbusException {
-        Task removed = tasks.delete(oneBasedIndex);
+        // High-level: Just tell the list to delete and the UI to show it
+        Task removed = tasks.deleteTask(oneBasedIndex);
         ui.showDeleted(removed, tasks.size());
     }
-
 }
 
 

@@ -29,11 +29,10 @@ public class UnmarkCommand extends Command {
      */
     @Override
     public void execute(TaskList tasks, Ui ui) throws NimbusException {
-        Task t = tasks.get(userIndex);
-        t.unmark();
+        // Refactored for SLAP: TaskList now handles the internal unmarking logic
+        Task t = tasks.unmarkTask(userIndex);
         ui.showUnmarked(t);
     }
-
 }
 
 
