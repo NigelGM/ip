@@ -2,6 +2,7 @@ package nimbus.task;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import nimbus.exception.NimbusException;
 import nimbus.parser.Parser;
@@ -40,17 +41,15 @@ public class TaskList {
     }
 
     /**
-     * Converts all tasks into save-file lines.
+     * Converts all tasks into save-file lines using Java Streams.
      *
      * @return List of storage strings for all tasks.
      */
     public List<String> toStorageLines() {
         assert tasks != null;
-        ArrayList<String> lines = new ArrayList<>();
-        for (Task t : tasks) {
-            lines.add(t.toStorageString());
-        }
-        return lines;
+        return tasks.stream()
+                .map(Task::toStorageString)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -100,7 +99,7 @@ public class TaskList {
     }
 
     /**
-     * Finds tasks whose description contains the keyword (case-insensitive).
+     * Finds tasks whose description contains the keyword (case-insensitive) using Java Streams.
      * Uses a guard clause for better code quality.
      *
      * @param keyword Search keyword
@@ -113,13 +112,9 @@ public class TaskList {
         }
 
         String needle = keyword.toLowerCase();
-        ArrayList<Task> matches = new ArrayList<>();
-        for (Task t : tasks) {
-            if (t.getDescription().toLowerCase().contains(needle)) {
-                matches.add(t);
-            }
-        }
-        return matches;
+        return tasks.stream()
+                .filter(t -> t.getDescription().toLowerCase().contains(needle))
+                .collect(Collectors.toList());
     }
 
     /**
