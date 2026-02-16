@@ -25,8 +25,7 @@ public class FindCommand extends Command {
     @Override
     public String execute(TaskList tasks, Ui ui) throws NimbusException {
         List<Task> matches = tasks.findByKeyword(keyword);
-        ui.showFindResults(keyword, matches);
-        return null;
+        // FIX: Return the UI string instead of null
+        return ui.showFindResults(keyword, matches);
     }
-
 }

@@ -2,7 +2,6 @@ package nimbus;
 
 import java.io.IOException;
 import java.util.List;
-
 import nimbus.command.Command;
 import nimbus.exception.NimbusException;
 import nimbus.parser.Parser;
@@ -13,7 +12,7 @@ import nimbus.ui.Ui;
 
 /**
  * Main entry point for the Nimbus application.
- * Handles component initialization, data loading, and the execution loop.
+ * Handles component initialization, data loading, and the main execution loop for the GUI.
  */
 public class Nimbus {
     private final Storage storage;
@@ -24,7 +23,7 @@ public class Nimbus {
     /**
      * Initializes Nimbus with a file path for storage.
      *
-     * @param filePath Path to the local save file.
+     * @param filePath Path to the local save file (e.g., "data/nimbus.txt").
      */
     public Nimbus(String filePath) {
         this.ui = new Ui();
@@ -34,7 +33,8 @@ public class Nimbus {
     }
 
     /**
-     * Loads tasks from storage and skips duplicates to ensure list integrity.
+     * Loads tasks from the storage file and populates the TaskList.
+     * Skips duplicates found in the file to maintain integrity.
      */
     private void loadFromStorage() {
         try {
@@ -43,43 +43,50 @@ public class Nimbus {
                 Task t = Parser.parseStoredTask(line);
                 if (t != null) {
                     try {
-                        tasks.add(t); // Now handles the checked NimbusException
+                        tasks.add(t); // Duplicate detection logic triggered here
                     } catch (NimbusException e) {
-                        // Skip duplicates in the save file quietly
+                        // Skip duplicates in storage silently
                     }
                 }
             }
         } catch (IOException e) {
-            ui.showLoadingError(); // Ensure this method exists in Ui.java
+            ui.showLoadingError();
         }
     }
 
     /**
-     * Processes user input and returns the application's response.
+     * Processes user input, executes commands, and returns the application's response.
+     * Automatically saves the current state to disk after every successful command.
      *
-     * @param input Raw user input string.
-     * @return Response string to be displayed in the GUI.
+     * @param input Raw user input string from the GUI.
+     * @return Response string to be displayed in the chat bubble.
      */
     public String getResponse(String input) {
         try {
             Command c = Parser.parse(input);
-            // 1. Execute with only TWO arguments
             String response = c.execute(tasks, ui);
-
-            // 2. Save the state after every successful command
             storage.save(tasks.toStorageLines());
-
             this.isExit = c.isExit();
             return response;
         } catch (NimbusException | IOException e) {
-            return e.getMessage();
+            // FIX: Wrap the message in ui.showError to clear the warning
+            return ui.showError(e.getMessage());
         }
     }
 
     /**
-     * Returns whether the application should exit.
+     * Returns the initial greeting message when the application starts.
      *
-     * @return True if the exit command was called, false otherwise.
+     * @return A welcome string.
+     */
+    public String getGreeting() {
+        return "Hello! I'm Nimbus. How can I help you today?";
+    }
+
+    /**
+     * Returns whether the application should terminate.
+     *
+     * @return True if the exit command was processed, false otherwise.
      */
     public boolean isExit() {
         return isExit;

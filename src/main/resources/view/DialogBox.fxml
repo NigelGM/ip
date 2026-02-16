@@ -1,20 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
 
-<fx:root alignment="TOP_RIGHT"
-         maxHeight="1.7976931348623157E308"
-         maxWidth="1.7976931348623157E308"
-         type="javafx.scene.layout.HBox"
-         xmlns="http://javafx.com/javafx/17.0.2-ea"
-         xmlns:fx="http://javafx.com/fxml/1"
-         spacing="10">
-    <Label fx:id="dialog" text="Label" wrapText="true" minHeight="-Infinity" />
-    <ImageView fx:id="displayPicture" fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" />
+<fx:root alignment="TOP_RIGHT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308"
+         type="javafx.scene.layout.HBox" xmlns="http://javafx.com/javafx/17.0.2-ea"
+         xmlns:fx="http://javafx.com/fxml/1" spacing="10">
+    <children>
+        <Label fx:id="dialog" text="Label" wrapText="true" minHeight="-Infinity" maxWidth="250.0"
+               style="-fx-background-color: #e8e8e8; -fx-background-radius: 10; -fx-padding: 10; -fx-text-fill: black;" />
+        <ImageView fx:id="displayPicture" fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" />
+    </children>
     <padding>
-        <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
+        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
     </padding>
 </fx:root>

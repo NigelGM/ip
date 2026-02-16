@@ -14,7 +14,6 @@ public abstract class Command {
      *
      * @param tasks task list to operate on
      * @param ui    ui to show messages
-     * @return
      * @throws NimbusException if command execution fails
      */
     public abstract String execute(TaskList tasks, Ui ui) throws NimbusException;

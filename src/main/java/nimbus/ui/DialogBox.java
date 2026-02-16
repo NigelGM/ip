@@ -12,16 +12,19 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.shape.Circle;
 
+/**
+ * A custom control for dialog bubbles in the Nimbus GUI.
+ * Enforces layout constraints to keep text contained within the window.
+ */
 public class DialogBox extends HBox {
-
     @FXML
     private Label dialog;
     @FXML
     private ImageView displayPicture;
 
-    // Use CSS classes instead of hardcoded strings
     private DialogBox(String text, Image img, String styleClass) {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(MainWindow.class.getResource("/view/DialogBox.fxml"));
@@ -29,18 +32,22 @@ public class DialogBox extends HBox {
             fxmlLoader.setRoot(this);
             fxmlLoader.load();
         } catch (IOException e) {
-            throw new RuntimeException("Critical failure loading DialogBox FXML", e);
+            throw new RuntimeException("FXML loading failed for DialogBox", e);
         }
 
         dialog.setText(text);
         displayPicture.setImage(img);
 
-        // Code Quality: Add CSS class instead of setting inline style
-        dialog.getStyleClass().add(styleClass);
-        this.getStyleClass().add("dialog-box"); // Adds padding/spacing from CSS
+        // --- THE UI FIXES ---
+        // Tells the label to move text to the next line
+        dialog.setWrapText(true);
+        // Forces the bubble to grow vertically to fit wrapped text
+        dialog.setMinHeight(Region.USE_PREF_SIZE);
+        // Hard limit to prevent the horizontal leak
+        dialog.setMaxWidth(250.0);
 
-        Circle clip = new Circle(25, 25, 25);
-        displayPicture.setClip(clip);
+        dialog.getStyleClass().add(styleClass);
+        displayPicture.setClip(new Circle(25, 25, 25));
     }
 
     private void flip() {
@@ -51,7 +58,6 @@ public class DialogBox extends HBox {
     }
 
     public static DialogBox getUserDialog(String text, Image img) {
-        // Pass the CSS class name "user-label"
         return new DialogBox(text, img, "user-label");
     }
 

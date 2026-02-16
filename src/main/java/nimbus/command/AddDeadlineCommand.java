@@ -29,15 +29,14 @@ public class AddDeadlineCommand extends Command {
      *
      * @param tasks The task list to add into.
      * @param ui    The UI used to show feedback.
-     * @return
      * @throws NimbusException If the task cannot be added.
      */
     @Override
     public String execute(TaskList tasks, Ui ui) throws NimbusException {
         Deadline d = new Deadline(description, by);
         int size = tasks.add(d);
-        ui.showAdded(d, size);
-        return null;
+        // FIX: Return the UI string instead of null
+        return ui.showAdded(d, size);
     }
 
 }

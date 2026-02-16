@@ -1,140 +1,128 @@
 package nimbus.ui;
 
 import java.util.List;
-
 import nimbus.exception.NimbusException;
 import nimbus.task.Task;
 import nimbus.task.TaskList;
 
 /**
- * Handles all user-facing messages.
- * <p>
- * Supports two modes:
- * <ul>
- * <li>Console printing (optional)</li>
- * <li>Buffering output as a String (for JavaFX GUI)</li>
- * </ul>
+ * Handles generating all user-facing messages as formatted Strings for the GUI.
+ * This class translates internal application state into human-readable feedback.
  */
 public class Ui {
 
-    private final boolean printToConsole;
-    private final StringBuilder buffer = new StringBuilder();
-
     /**
-     * Creates an Ui that prints to console and buffers output.
+     * Constructs a {@code Ui} instance.
      */
-    public Ui() {
-        this(true);
-    }
+    public Ui() {}
 
     /**
-     * Creates an Ui with configurable console printing.
+     * Returns a confirmation message when a task is successfully added.
      *
-     * @param printToConsole true to print to console, false to only buffer
+     * @param task The task that was added.
+     * @param size The new size of the task list.
+     * @return A confirmation string for the GUI.
      */
-    public Ui(boolean printToConsole) {
-        this.printToConsole = printToConsole;
+    public String showAdded(Task task, int size) {
+        return "Got it. I've added this task:\n  " + task
+                + "\nNow you have " + size + " tasks in the list.";
     }
 
     /**
-     * Clears buffered output (call before generating a new response).
-     */
-    public void resetBuffer() {
-        buffer.setLength(0);
-    }
-
-    /**
-     * Returns the buffered output as a String (trimmed).
+     * Returns the full task list as a formatted string.
+     * Fixed: Added 'throws NimbusException' to resolve IDE red line.
      *
-     * @return buffered output
+     * @param tasks The task list to display.
+     * @return A string representation of the task list.
+     * @throws NimbusException If an error occurs accessing tasks.
      */
-    public String getBufferedOutput() {
-        return buffer.toString().stripTrailing();
-    }
-
-    private void out(String s) {
-        assert s != null : "Cannot output a null string";
-        if (printToConsole) {
-            System.out.println(s);
+    public String showList(TaskList tasks) throws NimbusException {
+        assert tasks != null : "TaskList cannot be null";
+        if (tasks.size() == 0) {
+            return "Your task list is currently empty!";
         }
-        buffer.append(s).append(System.lineSeparator());
-    }
-
-    private void say(String msg) {
-        out(msg);
-    }
-
-    public void showGreeting() {
-        out("Hello! I'm Nimbus");
-        out("What can I do for you?");
-    }
-
-    public void showError(String message) {
-        assert message != null : "Error message should not be null";
-        say(message);
-    }
-
-    public void showBye() {
-        say("Bye. Hope to see you again soon!");
-    }
-
-    public void showAdded(Task task, int size) {
-        assert task != null : "Added task cannot be null";
-        say("Got it. I've added this task:");
-        say("  " + task);
-        say("Now you have " + size + " tasks in the list.");
-    }
-
-    public void showList(TaskList tasks) {
-        assert tasks != null : "TaskList to display cannot be null";
-        say("Here are the tasks in your list:");
+        StringBuilder sb = new StringBuilder("Here are the tasks in your list:\n");
         for (int i = 0; i < tasks.size(); i++) {
-            try {
-                say((i + 1) + ". " + tasks.getByZeroBasedIndex(i));
-            } catch (NimbusException e) {
-                // should not happen, but safe
-                say("Error displaying task " + (i + 1) + ": " + e.getMessage());
-            }
+            // TaskList access (e.g., .get()) requires this 'throws' clause
+            sb.append((i + 1)).append(". ").append(tasks.get(i + 1)).append("\n");
         }
-    }
-
-    public void showMarked(Task task) {
-        assert task != null : "Marked task cannot be null";
-        say("Nice! I've marked this task as done:");
-        say("  " + task);
-    }
-
-    public void showUnmarked(Task task) {
-        assert task != null : "Unmarked task cannot be null";
-        say("OK, I've marked this task as not done yet:");
-        say("  " + task);
-    }
-
-    public void showDeleted(Task task, int size) {
-        assert task != null : "Deleted task cannot be null";
-        say("Noted. I've removed this task:");
-        say("  " + task);
-        say("Now you have " + size + " tasks in the list.");
-    }
-
-    public void showFindResults(String keyword, List<Task> matches) {
-        assert keyword != null : "Search keyword for find results cannot be null";
-        assert matches != null : "Match list for find results cannot be null";
-        if (matches.isEmpty()) {
-            say("No matching tasks found for \"" + keyword + "\".");
-        } else {
-            say("Here are the matching tasks in your list for \"" + keyword + "\":");
-            for (int i = 0; i < matches.size(); i++) {
-                say((i + 1) + ". " + matches.get(i));
-            }
-        }
+        return sb.toString().trim();
     }
 
     /**
-     * Displays an error message when the storage file fails to load.
+     * Returns a message confirming a task is marked as done.
+     *
+     * @param task The marked task.
+     * @return A confirmation string.
+     */
+    public String showMarked(Task task) {
+        return "Nice! I've marked this task as done:\n  " + task;
+    }
+
+    /**
+     * Returns a message confirming a task is marked as not done.
+     *
+     * @param task The unmarked task.
+     * @return A confirmation string.
+     */
+    public String showUnmarked(Task task) {
+        return "OK, I've marked this task as not done yet:\n  " + task;
+    }
+
+    /**
+     * Returns a confirmation message when a task is deleted.
+     *
+     * @param task The removed task.
+     * @param size The remaining number of tasks.
+     * @return A confirmation string.
+     */
+    public String showDeleted(Task task, int size) {
+        return "Noted. I've removed this task:\n  " + task
+                + "\nNow you have " + size + " tasks in the list.";
+    }
+
+    /**
+     * Returns the results of a find operation.
+     *
+     * @param keyword The keyword used for searching.
+     * @param matches The list of tasks containing the keyword.
+     * @return A formatted result string.
+     */
+    public String showFindResults(String keyword, List<Task> matches) {
+        if (matches.isEmpty()) {
+            return "No matching tasks found for \"" + keyword + "\".";
+        }
+        StringBuilder sb = new StringBuilder("Matching tasks for \"" + keyword + "\":\n");
+        for (int i = 0; i < matches.size(); i++) {
+            sb.append((i + 1)).append(". ").append(matches.get(i)).append("\n");
+        }
+        return sb.toString().trim();
+    }
+
+    /**
+     * Returns a formatted goodbye message.
+     *
+     * @return A farewell string.
+     */
+    public String showBye() {
+        return "Bye. Hope to see you again soon!";
+    }
+
+    /**
+     * Returns a formatted error message.
+     *
+     * @param message The specific error detail.
+     * @return A formatted error string.
+     */
+    public String showError(String message) {
+        return "OOPS!!! " + message;
+    }
+
+    /**
+     * Prints a loading error to the console for debugging.
      */
     public void showLoadingError() {
-        System.out.println("Error: Could not load tasks from storage. Starting with an empty list.");
+        System.err.println("Error: Could not load tasks from storage.");
     }
 }
 
