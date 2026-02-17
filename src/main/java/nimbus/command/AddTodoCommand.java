@@ -1,5 +1,6 @@
 package nimbus.command;
 
+import nimbus.exception.NimbusException;
 import nimbus.task.TaskList;
 import nimbus.task.Todo;
 import nimbus.ui.Ui;
@@ -27,7 +28,7 @@ public class AddTodoCommand extends Command {
      * @return A formatted string confirming the task addition.
      */
     @Override
-    public String execute(TaskList tasks, Ui ui) {
+    public String execute(TaskList tasks, Ui ui) throws NimbusException {
         // Pass 'false' for new, incomplete tasks
         Todo t = new Todo(description, false);
         int size = tasks.add(t);

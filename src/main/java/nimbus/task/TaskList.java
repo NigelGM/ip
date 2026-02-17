@@ -1,7 +1,9 @@
 package nimbus.task;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import nimbus.exception.NimbusException;
@@ -11,8 +13,8 @@ import nimbus.parser.Parser;
  * Represents an in-memory list of {@link Task} objects.
  * <p>
  * This class encapsulates a list of tasks and supports operations such as adding,
- * deleting, retrieving, and updating tasks. It also handles conversion to and from
- * storage-friendly string formats using Java Streams.
+ * deleting, retrieving, and updating tasks. It includes defensive checks for
+ * duplicate tasks and null-safety for storage operations.
  */
 public class TaskList {
     private final ArrayList<Task> tasks;
@@ -30,53 +32,72 @@ public class TaskList {
      * Corrupted or unparseable lines are filtered out automatically.
      *
      * @param storedLines A list of strings representing stored tasks.
+     * @throws NullPointerException If storedLines is null.
      */
     public TaskList(List<String> storedLines) {
-        assert storedLines != null : "Input lines for storage cannot be null";
+        Objects.requireNonNull(storedLines, "Input lines for storage cannot be null");
         this.tasks = storedLines.stream()
-                .map(Parser::parseStoredTask)       // Convert String -> Task
-                .filter(java.util.Objects::nonNull) // Remove any nulls (failed parses)
+                .filter(Objects::nonNull)
+                .map(Parser::parseStoredTask)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
     /**
      * Converts all tasks in the list into their storage string format.
      *
-     * @return A list of strings suitable for saving to a file.
+     * @return An unmodifiable list of strings suitable for saving to a file.
      */
     public List<String> toStorageLines() {
-        assert tasks != null : "Tasks list must exist to convert to storage lines";
         return tasks.stream()
+                .filter(Objects::nonNull)
                 .map(Task::toStorageString)
-                .collect(Collectors.toList());
+                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
     }
 
     /**
-     * Adds a new task to the list.
+     * Adds a new task to the list after verifying it is not a duplicate.
      *
      * @param task The task to add.
      * @return The new size of the task list.
+     * @throws NimbusException      If an identical task already exists in the list.
+     * @throws NullPointerException If the task is null.
      */
-    public int add(Task task) {
-        assert task != null : "Cannot add a null task to the list";
+    public int add(Task task) throws NimbusException {
+        Objects.requireNonNull(task, "Cannot add a null task to the list");
+        if (isDuplicateTask(task)) {
+            throw new NimbusException("This task is already floating in your clouds!");
+        }
         tasks.add(task);
         return tasks.size();
     }
 
     /**
-     * Retrieves a task using a one-based index (typically provided by user input).
+     * Checks if a task with the same type and description already exists in the list.
+     *
+     * @param newTask The task to check.
+     * @return true if a duplicate is found, false otherwise.
+     */
+    private boolean isDuplicateTask(Task newTask) {
+        return tasks.stream().anyMatch(t ->
+                t.getType() == newTask.getType() &&
+                        t.getDescription().equalsIgnoreCase(newTask.getDescription())
+        );
+    }
+
+    /**
+     * Retrieves a task using a one-based index.
      *
      * @param oneBasedIndex The one-based index (1 to size).
      * @return The task at the specified index.
      * @throws NimbusException If the index is out of valid range.
      */
     public Task get(int oneBasedIndex) throws NimbusException {
-        // Delegate to zero-based logic to avoid code duplication
         return getByZeroBasedIndex(oneBasedIndex - 1);
     }
 
     /**
-     * Retrieves a task using a zero-based index (used internally by commands).
+     * Retrieves a task using a zero-based index.
      *
      * @param index The zero-based index (0 to size-1).
      * @return The task at the specified index.
@@ -86,9 +107,7 @@ public class TaskList {
         if (index < 0 || index >= tasks.size()) {
             throw new NimbusException("Task number is out of range.");
         }
-        Task t = tasks.get(index);
-        assert t != null : "Task at valid internal index should not be null";
-        return t;
+        return tasks.get(index);
     }
 
     /**
@@ -103,22 +122,19 @@ public class TaskList {
         if (idx < 0 || idx >= tasks.size()) {
             throw new NimbusException("Task number is out of range.");
         }
-
-        Task removed = tasks.remove(idx);
-        assert removed != null : "Removed task should not be null";
-        return removed;
+        return tasks.remove(idx);
     }
 
     /**
      * Replaces the task at the specified zero-based index with a new task.
-     * Used by update commands to modify existing tasks.
      *
-     * @param index   The zero-based index of the task to replace.
-     * @param newTask The new task instance to set.
-     * @throws NimbusException If the index is out of valid range.
+     * @param index   The zero-based index.
+     * @param newTask The new task instance.
+     * @throws NimbusException      If the index is out of range.
+     * @throws NullPointerException If newTask is null.
      */
     public void setTask(int index, Task newTask) throws NimbusException {
-        assert newTask != null : "Cannot set a null task";
+        Objects.requireNonNull(newTask, "Replacement task cannot be null");
         if (index < 0 || index >= tasks.size()) {
             throw new NimbusException("Task index out of range.");
         }
@@ -126,42 +142,41 @@ public class TaskList {
     }
 
     /**
-     * Finds and returns a list of tasks whose descriptions contain the specified keyword.
-     * The search is case-insensitive.
+     * Finds tasks whose descriptions contain the specified keyword.
      *
      * @param keyword The keyword to search for.
      * @return A list of matching tasks.
+     * @throws NullPointerException If keyword is null.
      */
     public List<Task> findByKeyword(String keyword) {
-        assert keyword != null : "Search keyword cannot be null";
-        String needle = keyword.toLowerCase();
+        String needle = Objects.requireNonNull(keyword, "Search keyword cannot be null").toLowerCase();
         return tasks.stream()
                 .filter(t -> t.getDescription().toLowerCase().contains(needle))
                 .collect(Collectors.toList());
     }
 
     /**
-     * Marks the task at the specified one-based index as done.
+     * Marks a task as done using a one-based index.
      *
-     * @param oneBasedIndex The one-based index of the task.
+     * @param oneBasedIndex The one-based index.
      * @return The updated task.
-     * @throws NimbusException If the index is out of range.
+     * @throws NimbusException If index is invalid.
      */
     public Task markTaskAsDone(int oneBasedIndex) throws NimbusException {
-        Task t = get(oneBasedIndex); // Reuses the bounds checking in get()
+        Task t = get(oneBasedIndex);
         t.markAsDone();
         return t;
     }
 
     /**
-     * Marks the task at the specified one-based index as not done.
+     * Marks a task as not done using a one-based index.
      *
-     * @param oneBasedIndex The one-based index of the task.
+     * @param oneBasedIndex The one-based index.
      * @return The updated task.
-     * @throws NimbusException If the index is out of range.
+     * @throws NimbusException If index is invalid.
      */
     public Task unmarkTask(int oneBasedIndex) throws NimbusException {
-        Task t = get(oneBasedIndex); // Reuses the bounds checking in get()
+        Task t = get(oneBasedIndex);
         t.unmarkAsDone();
         return t;
     }
@@ -169,7 +184,7 @@ public class TaskList {
     /**
      * Returns the total number of tasks in the list.
      *
-     * @return The size of the task list.
+     * @return The size of the internal list.
      */
     public int size() {
         return tasks.size();

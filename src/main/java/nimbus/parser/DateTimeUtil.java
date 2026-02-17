@@ -117,19 +117,6 @@ public class DateTimeUtil {
     }
 
     /**
-     * Parses a string into a LocalDateTime object using the standard input format.
-     * This is a convenience alias for parseDateTime needed by UpdateCommand.
-     *
-     * @param dateString The date string to parse (e.g., "2026-02-17 1800").
-     * @return The parsed LocalDateTime object.
-     * @throws NimbusException If the string does not match the expected format.
-     */
-    public static LocalDateTime parse(String dateString) throws NimbusException {
-        // Just delegate to your existing robust method
-        return parseDateTime(dateString);
-    }
-
-    /**
      * Private constructor to prevent instantiation of this utility class.
      */
     private DateTimeUtil() {

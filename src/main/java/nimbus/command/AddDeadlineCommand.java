@@ -1,6 +1,8 @@
 package nimbus.command;
 
 import java.time.LocalDateTime;
+
+import nimbus.exception.NimbusException;
 import nimbus.task.Deadline;
 import nimbus.task.TaskList;
 import nimbus.ui.Ui;
@@ -18,7 +20,7 @@ public class AddDeadlineCommand extends Command {
     }
 
     @Override
-    public String execute(TaskList tasks, Ui ui) {
+    public String execute(TaskList tasks, Ui ui) throws NimbusException {
         Deadline d = new Deadline(description, by, false);
         int size = tasks.add(d);
         return ui.showAdded(d, size);

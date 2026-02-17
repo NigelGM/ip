@@ -124,7 +124,7 @@ public class UpdateCommand extends Command {
     /**
      * Helper to create a task preserving the original type.
      */
-    private Task createPreservedTypeTask(Task original, String description, boolean isDone) {
+    private Task createPreservedTypeTask(Task original, String description, boolean isDone) throws NimbusException {
         if (original instanceof Deadline deadline) {
             return new Deadline(description, deadline.getBy(), isDone);
         } else if (original instanceof Event event) {
