@@ -1,199 +1,173 @@
 package nimbus.ui;
 
-import java.util.List;
-import java.util.stream.IntStream;
-
 import nimbus.exception.NimbusException;
 import nimbus.task.Task;
 import nimbus.task.TaskList;
+import java.util.List;
 
 /**
  * Handles all user-facing messages for the Nimbus application.
  * <p>
- * This class provides methods to display feedback to the user and manages a string buffer
- * to facilitate integration with the JavaFX graphical user interface.
- * It supports both standard console output and buffered output for GUI dialog boxes.
+ * This class provides methods to format feedback for the user. It supports
+ * both direct console printing (for CLI testing) and returning formatted strings
+ * (for GUI integration).
  */
 public class Ui {
 
-    private final boolean printToConsole;
-    private final StringBuilder buffer = new StringBuilder();
+    private final boolean isPrintingToConsole;
 
     /**
-     * Constructs a default Ui instance that prints to the console and buffers output.
+     * Constructs a default {@code Ui} instance that prints to the console.
      */
     public Ui() {
         this(true);
     }
 
     /**
-     * Constructs an Ui instance with configurable console printing settings.
+     * Constructs a {@code Ui} instance with configurable console printing settings.
      *
-     * @param printToConsole true to enable System printing, false to only buffer output.
+     * @param isPrintingToConsole {@code true} to enable System printing, {@code false} to behave silently.
      */
-    public Ui(boolean printToConsole) {
-        this.printToConsole = printToConsole;
+    public Ui(boolean isPrintingToConsole) {
+        this.isPrintingToConsole = isPrintingToConsole;
     }
 
     /**
-     * Clears the current buffered output.
-     * This should be called before generating a new response to ensure the GUI
-     * does not display stale messages.
-     */
-    public void resetBuffer() {
-        buffer.setLength(0);
-    }
-
-    /**
-     * Returns the accumulated buffered output as a trimmed String.
+     * Internal helper to print messages to console (if enabled) and return them.
      *
-     * @return The buffered messages formatted for display.
+     * @param msg The message to be displayed.
+     * @return The message string.
      */
-    public String getBufferedOutput() {
-        return buffer.toString().stripTrailing();
-    }
-
-    /**
-     * Internal helper to route messages to both the console and the internal string buffer.
-     * * @param msg The message to be displayed.
-     */
-    private void say(String msg) {
+    private String say(String msg) {
         assert msg != null : "Output message cannot be null";
-        if (printToConsole) {
+        if (isPrintingToConsole) {
             System.out.println(msg);
         }
-        buffer.append(msg).append(System.lineSeparator());
+        return msg;
     }
 
     /**
-     * Displays the initial greeting message when the application starts.
+     * Returns the initial greeting message when the application starts.
+     *
+     * @return The greeting message.
      */
-    public void showGreeting() {
-        say("Hello! I'm Nimbus");
-        say("What can I do for you?");
+    public String showGreeting() {
+        return say("Hello! I'm Nimbus\nWhat can I do for you?");
     }
 
     /**
-     * Displays an error message to the user.
+     * Returns a formatted goodbye message.
+     *
+     * @return The goodbye message.
+     */
+    public String showBye() {
+        return say("Bye. Hope to see you again soon!");
+    }
+
+    /**
+     * Returns an error message formatted for display.
      *
      * @param message The error details to be shown.
+     * @return The formatted error message.
      */
-    public void showError(String message) {
-        assert message != null : "Error message should not be null";
-        say("Error: " + message);
+    public String showError(String message) {
+        return say("Error: " + message);
     }
 
     /**
-     * Displays a goodbye message when the user exits the application.
-     */
-    public void showBye() {
-        say("Bye. Hope to see you again soon!");
-    }
-
-    /**
-     * Confirms that a task has been added successfully.
+     * Returns a message confirming a task has been successfully added.
      *
-     * @param task The task that was added.
-     * @param size The new total number of tasks in the list.
+     * @param task       The task that was added.
+     * @param totalTasks The new total count of tasks in the list.
+     * @return The confirmation message.
      */
-    public void showAdded(Task task, int size) {
-        assert task != null : "Added task cannot be null";
-        say("Got it. I've added this task:");
-        say("  " + task);
-        say("Now you have " + size + " tasks in the list.");
+    public String showAdded(Task task, int totalTasks) {
+        return say("Got it. I've added this task:\n  " + task
+                + "\nNow you have " + totalTasks + " tasks in the list.");
     }
 
     /**
-     * Displays the full list of tasks.
-     * <p>
-     * This implementation utilizes {@link IntStream} to iterate through the tasks
-     * and follows the Single Level of Abstraction Principle (SLAP) by delegating
-     * line formatting to a helper method.
+     * Returns a message confirming a task has been successfully removed.
      *
-     * @param tasks The TaskList containing tasks to be displayed.
+     * @param task       The task that was removed.
+     * @param totalTasks The remaining total count of tasks in the list.
+     * @return The deletion confirmation message.
      */
-    public void showList(TaskList tasks) {
-        assert tasks != null : "TaskList to display cannot be null";
-        say("Here are the tasks in your list:");
-        IntStream.range(0, tasks.size())
-                .forEach(i -> displayTaskAt(tasks, i));
+    public String showDeleted(Task task, int totalTasks) {
+        return say("Noted. I've removed this task:\n  " + task
+                + "\nNow you have " + totalTasks + " tasks in the list.");
     }
 
     /**
-     * Formats and displays a single task at the specified index.
-     *
-     * @param tasks The TaskList to retrieve from.
-     * @param index The zero-based index of the task.
-     */
-    private void displayTaskAt(TaskList tasks, int index) {
-        try {
-            say((index + 1) + ". " + tasks.getByZeroBasedIndex(index));
-        } catch (NimbusException e) {
-            say((index + 1) + ". [Error retrieving task: " + e.getMessage() + "]");
-        }
-    }
-
-    /**
-     * Confirms that a task has been marked as completed.
+     * Returns a message confirming a task has been marked as completed.
      *
      * @param task The task that was marked.
+     * @return The confirmation message.
      */
-    public void showMarked(Task task) {
-        assert task != null : "Marked task cannot be null";
-        say("Nice! I've marked this task as done:");
-        say("  " + task);
+    public String showMarked(Task task) {
+        return say("Nice! I've marked this task as done:\n  " + task);
     }
 
     /**
-     * Confirms that a task has been marked as incomplete.
+     * Returns a message confirming a task has been set to incomplete.
      *
      * @param task The task that was unmarked.
+     * @return The confirmation message.
      */
-    public void showUnmarked(Task task) {
-        assert task != null : "Unmarked task cannot be null";
-        say("OK, I've marked this task as not done yet:");
-        say("  " + task);
+    public String showUnmarked(Task task) {
+        return say("OK, I've marked this task as not done yet:\n  " + task);
     }
 
     /**
-     * Confirms that a task has been successfully deleted.
+     * Returns a message confirming a task has been updated.
      *
-     * @param task The task that was removed.
-     * @param size The remaining number of tasks in the list.
+     * @param task The task that was updated.
+     * @return The confirmation message.
      */
-    public void showDeleted(Task task, int size) {
-        assert task != null : "Deleted task cannot be null";
-        say("Noted. I've removed this task:");
-        say("  " + task);
-        say("Now you have " + size + " tasks in the list.");
+    public String showUpdated(Task task) {
+        return say("Got it. I've updated the details for this task:\n  " + task);
     }
 
     /**
-     * Displays the results of a search operation.
-     * <p>
-     * Utilizes {@link IntStream} to iterate through matching results.
+     * Returns the formatted list of all tasks currently in the list.
      *
-     * @param keyword The search term used.
-     * @param matches The list of tasks matching the keyword.
+     * @param tasks The {@link TaskList} to format.
+     * @return A formatted string of all tasks, or an empty list message.
      */
-    public void showFindResults(String keyword, List<Task> matches) {
-        assert keyword != null : "Search keyword cannot be null";
-        assert matches != null : "Match list cannot be null";
-
-        if (matches.isEmpty()) {
-            say("No matching tasks found for \"" + keyword + "\".");
-            return;
+    public String showList(TaskList tasks) {
+        if (tasks.size() == 0) {
+            return say("Your task list is empty.");
         }
+        StringBuilder sb = new StringBuilder("Here are the tasks in your list:\n");
+        for (int i = 0; i < tasks.size(); i++) {
+            sb.append(getTaskDisplayString(tasks, i)).append("\n");
+        }
+        return say(sb.toString().trim());
+    }
 
-        say("Here are the matching tasks in your list for \"" + keyword + "\":");
-        IntStream.range(0, matches.size())
-                .forEach(i -> say((i + 1) + ". " + matches.get(i)));
+    /**
+     * Returns formatted results for a keyword search.
+     *
+     * @param keyword The search keyword used.
+     * @param results The list of tasks matching the keyword.
+     * @return A formatted string of search results.
+     */
+    public String showFindResults(String keyword, List<Task> results) {
+        if (results.isEmpty()) {
+            return say("No tasks found matching: " + keyword);
+        }
+        StringBuilder sb = new StringBuilder("Here are the matching tasks in your list:\n");
+        for (int i = 0; i < results.size(); i++) {
+            sb.append((i + 1)).append(".").append(results.get(i)).append("\n");
+        }
+        return say(sb.toString().trim());
+    }
+
+    private String getTaskDisplayString(TaskList tasks, int index) {
+        try {
+            return (index + 1) + ". " + tasks.getByZeroBasedIndex(index);
+        } catch (NimbusException e) {
+            return (index + 1) + ". [Error retrieving task]";
+        }
     }
 }
-
-
-
-
-
-
-

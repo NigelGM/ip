@@ -1,8 +1,7 @@
 package nimbus.task;
 
-import nimbus.parser.DateTimeUtil;
-
 import java.time.LocalDateTime;
+import nimbus.parser.DateTimeUtil;
 
 /**
  * Represents an event task with a start and end time.
@@ -12,16 +11,21 @@ public class Event extends Task {
     private final LocalDateTime to;
 
     /**
-     * Creates an event task.
+     * Creates an event task with a specific completion status.
+     * Used by UpdateCommand to preserve the 'done' state.
      *
      * @param description Event description.
-     * @param from Start time string (display/storage form).
-     * @param to End time string (display/storage form).
+     * @param from        Start time.
+     * @param to          End time.
+     * @param isDone      The completion status of the task.
      */
-    public Event(String description, LocalDateTime from, LocalDateTime to) {
-        super(TaskType.EVENT, description); // IMPORTANT: (TaskType, String)
+    public Event(String description, LocalDateTime from, LocalDateTime to, boolean isDone) {
+        super(TaskType.EVENT, description);
         this.from = from;
         this.to = to;
+        if (isDone) {
+            markAsDone();
+        }
     }
 
     public LocalDateTime getFrom() {
@@ -33,26 +37,20 @@ public class Event extends Task {
     }
 
     /**
-     * Overrides the generic Task method to include event-specific dates.
-     * This "uses" getFrom() and getTo(), resolving the IDE warning.
+     * Returns the storage string representation of the Event.
+     * Format: {@code E | 0 | description | start_time | end_time}
      */
     @Override
     public String toStorageString() {
-        return super.toStorageString()
-                + " | " + DateTimeUtil.formatForStorage(getFrom())
-                + " | " + DateTimeUtil.formatForStorage(getTo());
+        return super.toStorageString() + " | " +
+                DateTimeUtil.formatForStorage(from) + " | " +
+                DateTimeUtil.formatForStorage(to);
     }
 
-    /**
-     * Converts this event task into a storage string that includes start and end times.
-     *
-     * @return Storage string format with event duration.
-     */
     @Override
     public String toString() {
-        return super.toString()
-                + " (from: " + DateTimeUtil.formatForDisplay(from)
-                + " to: " + DateTimeUtil.formatForDisplay(to) + ")";
+        return super.toString() + " (from: " + DateTimeUtil.formatForDisplay(from) +
+                " to: " + DateTimeUtil.formatForDisplay(to) + ")";
     }
 }
 

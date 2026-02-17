@@ -14,7 +14,7 @@ public abstract class Task {
     /**
      * Constructs a Task with the given type and description.
      *
-     * @param type Task type.
+     * @param type        Task type.
      * @param description Task description.
      */
     protected Task(TaskType type, String description) {
@@ -84,7 +84,10 @@ public abstract class Task {
 
     /**
      * Converts this task into a string suitable for storing in the save file.
-     * Subclasses should override if they include additional fields.
+     * <p>
+     * Base format: {@code TYPE | DONE_STATUS | DESCRIPTION}
+     * (e.g., "T | 1 | read book")
+     * </p>
      *
      * @return Storage string format.
      */

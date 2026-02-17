@@ -40,7 +40,7 @@ public class Nimbus {
      * @param filePath path to save/load data
      */
     public Nimbus(String filePath) {
-        this.ui = new Ui(false); // false = do not print to console, only buffer
+        this.ui = new Ui(false); // false = do not print to console
         this.storage = new Storage(filePath);
         this.tasks = new TaskList();
         this.isExit = false;
@@ -54,9 +54,8 @@ public class Nimbus {
      * @return greeting message
      */
     public String getGreeting() {
-        ui.resetBuffer();
-        ui.showGreeting();
-        return ui.getBufferedOutput();
+        // Removed ui.resetBuffer() - no longer needed
+        return ui.showGreeting();
     }
 
     /**
@@ -67,31 +66,32 @@ public class Nimbus {
      * @return Nimbus formatted response
      */
     public String getResponse(String input) {
-        ui.resetBuffer();
+        // Removed ui.resetBuffer() - no longer needed
 
         try {
             Command c = Parser.parse(input);
-            c.execute(tasks, ui);
+            String response = c.execute(tasks, ui);
 
-            // Save after every command (safe and simple)
             try {
                 storage.saveLines(tasks.toStorageLines());
             } catch (IOException e) {
-                ui.showError("Could not save to file. Your changes may not persist.");
+                return ui.showError("Could not save to file. Your changes may not persist.");
             }
 
             isExit = c.isExit();
-            return ui.getBufferedOutput();
+            return response;
 
         } catch (NimbusException e) {
             isExit = false;
-            ui.showError(e.getMessage());
-            return ui.getBufferedOutput();
+            return ui.showError(e.getMessage());
+        } catch (Exception e) {
+            isExit = false;
+            return ui.showError("An unexpected error occurred: " + e.getMessage());
         }
     }
 
     /**
-     * Whether the last processed command requested to exit.
+     * Checks if the last processed command requested to exit.
      *
      * @return true if app should exit, false otherwise
      */
@@ -103,13 +103,17 @@ public class Nimbus {
         try {
             List<String> lines = storage.loadLines();
             for (String line : lines) {
-                Task t = Parser.parseStoredTask(line);
-                if (t != null) {
-                    tasks.add(t);
+                try {
+                    Task t = Parser.parseStoredTask(line);
+                    if (t != null) {
+                        tasks.add(t);
+                    }
+                } catch (Exception e) {
+                    // Ignore corrupted lines
                 }
             }
         } catch (IOException e) {
-            // First run / no file yet -> start empty (no need to scare user)
+            // First run / no file yet
         }
     }
 }

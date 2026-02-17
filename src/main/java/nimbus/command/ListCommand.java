@@ -1,23 +1,18 @@
 package nimbus.command;
 
-import nimbus.ui.Ui;
+import nimbus.exception.NimbusException;
 import nimbus.task.TaskList;
+import nimbus.ui.Ui;
 
 /**
  * Lists all tasks currently stored in the task list.
  */
 public class ListCommand extends Command {
 
-    /**
-     * Executes the list command by displaying all tasks.
-     *
-     * @param tasks The task list to display.
-     * @param ui    The UI used to show the task list.
-     */
     @Override
-    public void execute(TaskList tasks, Ui ui) {
-        ui.showList(tasks);
+    public String execute(TaskList tasks, Ui ui) throws NimbusException {
+        // Fixes the 'showList' warning and empty GUI dialog
+        return ui.showList(tasks);
     }
-
 }
 

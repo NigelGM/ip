@@ -12,6 +12,8 @@ import nimbus.command.DeleteCommand;
 import nimbus.command.ListCommand;
 import nimbus.command.MarkCommand;
 import nimbus.command.UnmarkCommand;
+import nimbus.command.UpdateCommand;
+import nimbus.command.UpdateCommand.EditTaskDescriptor; // Import internal class
 import nimbus.exception.NimbusException;
 import nimbus.task.Deadline;
 import nimbus.task.Event;
@@ -21,9 +23,8 @@ import nimbus.task.Todo;
 /**
  * Parses raw user input strings into executable {@link Command} objects.
  * <p>
- * The input is expected to follow the Nimbus command format. This class acts as a
- * facade for interpreting user intentions and converting them into command objects
- * that can be executed by the application logic.
+ * This class acts as the bridge between the user's raw text and the application's logic.
+ * It is a static utility class, meaning methods are called on the class itself.
  */
 public class Parser {
 
@@ -37,8 +38,9 @@ public class Parser {
     private static final String CMD_TODO = "todo";
     private static final String CMD_DEADLINE = "deadline";
     private static final String CMD_EVENT = "event";
+    private static final String CMD_UPDATE = "update";
 
-    // --- Error Messages & Formats ---
+    // --- Error Messages ---
     private static final String ERR_EMPTY_COMMAND = "Please type a command.";
     private static final String ERR_UNKNOWN_COMMAND = "I'm sorry, but I don't know what that means.";
     private static final String ERR_DESC_EMPTY = "The description cannot be empty.";
@@ -63,12 +65,10 @@ public class Parser {
             throw new NimbusException(ERR_EMPTY_COMMAND);
         }
 
-        // Split into [commandWord, restOfArguments]
         String[] parts = trimmed.split("\\s+", 2);
-        String commandWord = parts[0];
+        String commandWord = parts[0].toLowerCase(); // Safe to lower case command word
         String rest = parts.length > 1 ? parts[1].trim() : "";
 
-        // High-level SLAP: Delegates specific parsing to helper methods
         return switch (commandWord) {
             case CMD_BYE -> new ByeCommand();
             case CMD_LIST -> new ListCommand();
@@ -79,33 +79,20 @@ public class Parser {
             case CMD_TODO -> prepareTodo(rest);
             case CMD_DEADLINE -> parseDeadline(rest);
             case CMD_EVENT -> parseEvent(rest);
+            case CMD_UPDATE -> prepareUpdate(rest);
             default -> throw new NimbusException(ERR_UNKNOWN_COMMAND);
         };
     }
 
     // ==================================================================================
-    // Helper Methods (SLAP Improvements)
+    // Helper Methods
     // ==================================================================================
 
-    /**
-     * Prepares a {@link AddTodoCommand} by validating the description argument.
-     *
-     * @param args The description of the todo task.
-     * @return A valid {@link AddTodoCommand}.
-     * @throws NimbusException If the description is empty or invalid.
-     */
     private static Command prepareTodo(String args) throws NimbusException {
         validateDescription(args);
         return new AddTodoCommand(args);
     }
 
-    /**
-     * Prepares a {@link FindCommand} by validating the search keyword.
-     *
-     * @param args The keyword to search for.
-     * @return A valid {@link FindCommand}.
-     * @throws NimbusException If the keyword is empty.
-     */
     private static Command prepareFind(String args) throws NimbusException {
         if (args.isEmpty()) {
             throw new NimbusException(USAGE_FIND);
@@ -113,17 +100,6 @@ public class Parser {
         return new FindCommand(args);
     }
 
-    /**
-     * Parses the argument string into a one-based integer index.
-     * <p>
-     * This helper centralizes integer parsing and error handling for commands
-     * that require a task index (mark, unmark, delete).
-     *
-     * @param args The argument portion containing the index.
-     * @param commandName The name of the command (for error messaging).
-     * @return The parsed one-based index.
-     * @throws NimbusException If the argument is missing, not a number, or not positive.
-     */
     private static int parseOneBasedIndex(String args, String commandName) throws NimbusException {
         if (args.isEmpty()) {
             throw new NimbusException(ERR_NO_INDEX + commandName);
@@ -139,91 +115,46 @@ public class Parser {
         }
     }
 
-    /**
-     * Parses the arguments for a deadline command.
-     * <p>
-     * Expected format: {@code <description> /by <yyyy-MM-dd HHmm>}
-     *
-     * @param args The arguments containing description and deadline time.
-     * @return A valid {@link AddDeadlineCommand}.
-     * @throws NimbusException If the format is invalid or parts are missing.
-     */
     private static Command parseDeadline(String args) throws NimbusException {
         String[] split = args.split("\\s*/by\\s*", 2);
-
-        if (split.length < 2) {
-            throw new NimbusException(USAGE_DEADLINE);
-        }
+        if (split.length < 2) throw new NimbusException(USAGE_DEADLINE);
 
         String desc = split[0].trim();
         String byStr = split[1].trim();
 
         validateDescription(desc);
-        if (byStr.isEmpty()) {
-            throw new NimbusException(USAGE_DEADLINE);
-        }
+        if (byStr.isEmpty()) throw new NimbusException(USAGE_DEADLINE);
 
         LocalDateTime by = DateTimeUtil.parseDateTime(byStr);
         return new AddDeadlineCommand(desc, by);
     }
 
-    /**
-     * Parses the arguments for an event command.
-     * <p>
-     * Expected format: {@code <description> /from <start> /to <end>}
-     *
-     * @param args The arguments containing description, start time, and end time.
-     * @return A valid {@link AddEventCommand}.
-     * @throws NimbusException If the format is invalid or parts are missing.
-     */
     private static Command parseEvent(String args) throws NimbusException {
         String[] splitFrom = args.split("\\s*/from\\s*", 2);
-        if (splitFrom.length < 2) {
-            throw new NimbusException(USAGE_EVENT);
-        }
+        if (splitFrom.length < 2) throw new NimbusException(USAGE_EVENT);
 
         String desc = splitFrom[0].trim();
         String[] splitTo = splitFrom[1].split("\\s*/to\\s*", 2);
-        if (splitTo.length < 2) {
-            throw new NimbusException(USAGE_EVENT);
-        }
+        if (splitTo.length < 2) throw new NimbusException(USAGE_EVENT);
 
         String fromStr = splitTo[0].trim();
         String toStr = splitTo[1].trim();
 
         validateDescription(desc);
-        if (fromStr.isEmpty() || toStr.isEmpty()) {
-            throw new NimbusException(USAGE_EVENT);
-        }
+        if (fromStr.isEmpty() || toStr.isEmpty()) throw new NimbusException(USAGE_EVENT);
 
         LocalDateTime from = DateTimeUtil.parseDateTime(fromStr);
         LocalDateTime to = DateTimeUtil.parseDateTime(toStr);
         return new AddEventCommand(desc, from, to);
     }
 
-    /**
-     * Validates that the description is not empty and does not contain illegal characters.
-     *
-     * @param desc The description string to check.
-     * @throws NimbusException If the description is empty or contains '|'.
-     */
     private static void validateDescription(String desc) throws NimbusException {
-        if (desc.isEmpty()) {
-            throw new NimbusException(ERR_DESC_EMPTY);
-        }
-        if (desc.contains("|")) {
-            throw new NimbusException(ERR_INVALID_PIPE);
-        }
+        if (desc.isEmpty()) throw new NimbusException(ERR_DESC_EMPTY);
+        if (desc.contains("|")) throw new NimbusException(ERR_INVALID_PIPE);
     }
 
     /**
      * Parses a single line from the storage file into a {@link Task} object.
-     * <p>
-     * Used during startup to load the task list. Robustly handles corrupted lines
-     * by returning {@code null} instead of crashing.
-     *
-     * @param line A single line of text from the saved file.
-     * @return The reconstructed {@link Task}, or {@code null} if parsing fails.
      */
     public static Task parseStoredTask(String line) {
         try {
@@ -236,26 +167,92 @@ public class Parser {
             boolean isDone = "1".equals(parts[1]);
             String desc = parts[2];
 
-            Task task = switch (type) {
-                case "T" -> new Todo(desc);
+            return switch (type) {
+                case "T" -> new Todo(desc, isDone);
                 case "D" -> (parts.length >= 4)
-                        ? new Deadline(desc, DateTimeUtil.parseDateTime(parts[3]))
+                        ? new Deadline(desc, DateTimeUtil.parseDateTime(parts[3]), isDone)
                         : null;
                 case "E" -> (parts.length >= 5)
-                        ? new Event(desc, DateTimeUtil.parseDateTime(parts[3]), DateTimeUtil.parseDateTime(parts[4]))
+                        ? new Event(desc, DateTimeUtil.parseDateTime(parts[3]), DateTimeUtil.parseDateTime(parts[4]), isDone)
                         : null;
                 default -> null;
             };
 
-            if (task != null && isDone) {
-                task.markAsDone();
-            }
-            return task;
-
         } catch (Exception e) {
-            // Return null to skip corrupted lines without crashing the app
-            return null;
+            return null; // Skip corrupted lines
         }
+    }
+
+    /**
+     * Parses arguments for the 'update' command.
+     * FIX: Now correctly captures descriptions without needing a /d flag.
+     */
+    private static Command prepareUpdate(String args) throws NimbusException {
+        String[] parts = args.trim().split(" ", 2);
+        if (parts.length < 1 || parts[0].isEmpty()) {
+            throw new NimbusException("Please specify the task index to update.");
+        }
+
+        int index;
+        try {
+            index = Integer.parseInt(parts[0]) - 1; // 0-based index
+        } catch (NumberFormatException e) {
+            throw new NimbusException("Invalid task index provided.");
+        }
+
+        EditTaskDescriptor descriptor = new EditTaskDescriptor();
+
+        if (parts.length > 1) {
+            String params = " " + parts[1]; // Add padding for regex safety
+
+            // 1. Identify where the dates start
+            int byIndex = params.indexOf(" /by ");
+            int fromIndex = params.indexOf(" /from ");
+            int toIndex = params.indexOf(" /to ");
+
+            // 2. Determine where the description ends (it ends at the first flag found)
+            int cutOffIndex = params.length();
+            if (byIndex != -1) cutOffIndex = Math.min(cutOffIndex, byIndex);
+            if (fromIndex != -1) cutOffIndex = Math.min(cutOffIndex, fromIndex);
+            if (toIndex != -1) cutOffIndex = Math.min(cutOffIndex, toIndex);
+
+            // 3. Extract the description (everything before the first flag)
+            String potentialDesc = params.substring(0, cutOffIndex).trim();
+            if (!potentialDesc.isEmpty()) {
+                descriptor.setDescription(potentialDesc);
+            }
+
+            // 4. Extract Flags
+            // We use simple substring extraction based on the known indices
+            if (byIndex != -1) {
+                String val = extractArg(params, byIndex + 5, new int[]{fromIndex, toIndex});
+                descriptor.setBy(val);
+            }
+            if (fromIndex != -1) {
+                String val = extractArg(params, fromIndex + 7, new int[]{byIndex, toIndex});
+                descriptor.setFrom(val);
+            }
+            if (toIndex != -1) {
+                String val = extractArg(params, toIndex + 5, new int[]{byIndex, fromIndex});
+                descriptor.setTo(val);
+            }
+        }
+
+        return new UpdateCommand(index, descriptor);
+    }
+
+    /**
+     * Helper to extract argument value until the next flag or end of string.
+     */
+    private static String extractArg(String full, int startIndex, int[] otherFlagIndices) {
+        int endIndex = full.length();
+        for (int idx : otherFlagIndices) {
+            // If another flag starts after this one, cut off there
+            if (idx > startIndex && idx < endIndex) {
+                endIndex = idx;
+            }
+        }
+        return full.substring(startIndex, endIndex).trim();
     }
 }
 

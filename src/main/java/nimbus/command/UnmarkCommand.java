@@ -21,19 +21,19 @@ public class UnmarkCommand extends Command {
     }
 
     /**
-     * Unmarks the specified task and shows a confirmation message.
+     * Unmarks the specified task and returns a confirmation message.
      *
      * @param tasks The task list containing the task.
      * @param ui    The UI used to show feedback.
+     * @return A string confirming the task is unmarked.
      * @throws NimbusException If the index is invalid.
      */
     @Override
-    public void execute(TaskList tasks, Ui ui) throws NimbusException {
-        // Refactored for SLAP: TaskList now handles the internal unmarking logic
+    public String execute(TaskList tasks, Ui ui) throws NimbusException {
         Task t = tasks.unmarkTask(userIndex);
-        ui.showUnmarked(t);
+        // Fixes 'showUnmarked' warning
+        return ui.showUnmarked(t);
     }
 }
-
 
 

@@ -17,13 +17,16 @@ public class ParserTest {
 
     // Minimal test UI to avoid spamming console
     static class TestUi extends Ui {
-        // override only what gets called; do nothing
-        @Override public void showAdded(nimbus.task.Task task, int size) {}
-        @Override public void showMarked(nimbus.task.Task task) {}
-        @Override public void showUnmarked(nimbus.task.Task task) {}
-        @Override public void showList(TaskList tasks) {}
-        @Override public void showDeleted(nimbus.task.Task task, int size) {}
-        @Override public void showError(String message) {}
+
+        @Override
+        public String showList(TaskList tasks) {
+            return "";
+        }
+
+        @Override
+        public String showError(String message) {
+            return "";
+        }
     }
 
     @Test
