@@ -3,6 +3,7 @@ package nimbus.ui;
 import java.io.IOException;
 import java.util.Collections;
 
+import javafx.animation.FadeTransition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -14,13 +15,18 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.shape.Circle;
+import javafx.util.Duration;
 
 /**
  * Represents a custom chat bubble control for the Nimbus GUI.
  * <p>
- * This control consists of a text label for the message and an {@link ImageView} for the
- * speaker's avatar. It supports alternating alignments (left for Nimbus, right for User)
- * through CSS styling and structural flipping.
+ * This control consists of a text label and an avatar image. It supports:
+ * <ul>
+ * <li>Alternating alignment (User right, Nimbus left)</li>
+ * <li>Circular avatar clipping</li>
+ * <li>Error message highlighting (Red bubbles)</li>
+ * <li>Smooth fade-in entrance animations</li>
+ * </ul>
  */
 public class DialogBox extends HBox {
 
@@ -30,11 +36,11 @@ public class DialogBox extends HBox {
     private ImageView displayPicture;
 
     /**
-     * Private constructor to initialize a dialog box with text and an image.
+     * Private constructor to initialize a dialog box.
      *
-     * @param text The message content to be displayed.
-     * @param img The avatar image of the speaker.
-     * @param styleClass The CSS class to apply to the dialog label (e.g., "user-label").
+     * @param text       The message content.
+     * @param img        The avatar image.
+     * @param styleClass The initial CSS class for the label.
      */
     private DialogBox(String text, Image img, String styleClass) {
         try {
@@ -51,10 +57,11 @@ public class DialogBox extends HBox {
 
         applyStyling(styleClass);
         clipAvatar();
+        animateEntrance(); // Trigger fade-in
     }
 
     /**
-     * Applies relevant CSS classes to the controls and sets the base container style.
+     * Applies relevant CSS classes to the controls.
      */
     private void applyStyling(String labelStyleClass) {
         dialog.getStyleClass().add(labelStyleClass);
@@ -62,17 +69,38 @@ public class DialogBox extends HBox {
     }
 
     /**
-     * Clips the speaker's avatar into a circular shape for a modern aesthetic.
+     * Clips the avatar into a circle.
      */
     private void clipAvatar() {
-        Circle clip = new Circle(25, 25, 25);
+        Circle clip = new Circle(25, 25, 25); // Radius 25 matches 50x50 ImageView
         displayPicture.setClip(clip);
     }
 
     /**
-     * Flips the dialog box horizontally.
-     * Reverses the order of children (moving image to the left) and changes
-     * alignment to {@code Pos.TOP_LEFT} for bot responses.
+     * Plays a smooth fade-in animation when the dialog box is created.
+     */
+    private void animateEntrance() {
+        FadeTransition ft = new FadeTransition(Duration.millis(200), this);
+        ft.setFromValue(0.0);
+        ft.setToValue(1.0);
+        ft.play();
+    }
+
+    /**
+     * Changes the bubble style to indicate an error (Red theme).
+     */
+    private void setErrorStyle() {
+        ObservableList<String> styles = dialog.getStyleClass();
+
+        // Fix: Just remove it directly.
+        // If "nimbus-label" isn't there, this line does nothing safely.
+        styles.remove("nimbus-label");
+
+        styles.add("error-label");
+    }
+
+    /**
+     * Flips the dialog box horizontally for Nimbus responses.
      */
     private void flip() {
         ObservableList<Node> tmp = FXCollections.observableArrayList(this.getChildren());
@@ -81,29 +109,19 @@ public class DialogBox extends HBox {
         setAlignment(Pos.TOP_LEFT);
     }
 
-    /**
-     * Factory method to create a user dialog box.
-     * The bubble is right-aligned by default with the "user-label" style.
-     *
-     * @param text The user's input message.
-     * @param img The user's avatar image.
-     * @return A styled DialogBox for the user.
-     */
     public static DialogBox getUserDialog(String text, Image img) {
         return new DialogBox(text, img, "user-label");
     }
 
-    /**
-     * Factory method to create a response dialog box from Nimbus.
-     * The bubble is flipped to the left and styled with the "nimbus-label" class.
-     *
-     * @param text The response message from Nimbus.
-     * @param img The cloud avatar for Nimbus.
-     * @return A flipped and styled DialogBox for Nimbus.
-     */
     public static DialogBox getNimbusDialog(String text, Image img) {
         var db = new DialogBox(text, img, "nimbus-label");
         db.flip();
+
+        // Check for error prefix and apply red style
+        if (text != null && text.startsWith("Error:")) {
+            db.setErrorStyle();
+        }
+
         return db;
     }
 }
