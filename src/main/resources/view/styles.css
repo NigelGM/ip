@@ -1,7 +1,7 @@
 /* Main background already set by your clouds.jpg */
 .root {
-    /* Modern, clean font stack */
-    -fx-font-family: "Segoe UI", "Helvetica Neue", "Arial", sans-serif;
+    /* Added "Segoe UI Emoji" to the list so emojis render correctly */
+    -fx-font-family: "Segoe UI Semilight", "Segoe UI Emoji", "Helvetica Neue", sans-serif;
     -fx-background-image: url("../image/clouds.jpg");
     -fx-background-size: cover;
 }
@@ -23,7 +23,9 @@
 
 /* Base Label Settings */
 .label {
-    -fx-font-size: 14px; /* Slightly larger text for readability */
+    -fx-font-size: 14px;
+    /* Optional: slightly increase line height for readability */
+    -fx-line-spacing: 1.2;
 }
 
 /* User Bubbles: Right-aligned (Blue) */
@@ -31,13 +33,14 @@
     -fx-background-color: #0084FF;
     -fx-text-fill: white;
     -fx-padding: 10 15 10 15;
+    /* Order: Top-Left, Top-Right, Bottom-Right, Bottom-Left */
     -fx-background-radius: 20 0 20 20;
     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 5, 0, 0, 2);
 }
 
 /* Nimbus Standard Bubbles: Left-aligned (White) */
 .nimbus-label {
-    -fx-background-color: rgba(255, 255, 255, 0.9);
+    -fx-background-color: rgba(255, 255, 255, 0.95); /* Slightly more opaque for readability */
     -fx-text-fill: #333333;
     -fx-padding: 10 15 10 15;
     -fx-background-radius: 0 20 20 20;
@@ -45,10 +48,11 @@
 }
 
 /* Nimbus Error Bubbles: Left-aligned (Red) */
+/* Triggered when message starts with "Error:" */
 .error-label {
     -fx-background-color: #ffebee; /* Very Light Red */
     -fx-text-fill: #c62828;        /* Dark Red Text */
-    -fx-font-weight: bold;
+    -fx-font-weight: bold;         /* Keep errors bold for attention */
     -fx-padding: 10 15 10 15;
     -fx-background-radius: 0 20 20 20;
     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 5, 0, 0, 2);
