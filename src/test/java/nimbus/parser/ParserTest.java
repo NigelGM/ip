@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import nimbus.command.Command;
 import nimbus.exception.NimbusException;
+import nimbus.command.HelpCommand;
 import nimbus.task.TaskList;
 import nimbus.ui.Ui;
 
@@ -62,6 +63,23 @@ public class ParserTest {
     @Test
     void parse_markNonNumber_throws() {
         assertThrows(NimbusException.class, () -> Parser.parse("mark abc"));
+    }
+
+    /**
+     * Tests that the 'help' keyword correctly returns a HelpCommand.
+     */
+    @Test
+    public void parse_helpCommand_success() throws NimbusException {
+        assertInstanceOf(HelpCommand.class, Parser.parse("help"));
+    }
+
+    /**
+     * Tests that unknown commands trigger a helpful error message suggesting 'help'.
+     */
+    @Test
+    public void parse_unknownCommand_exceptionThrown() {
+        NimbusException thrown = assertThrows(NimbusException.class, () -> Parser.parse("fly to the moon"));
+        assertTrue(thrown.getMessage().contains("fog"));
     }
 }
 

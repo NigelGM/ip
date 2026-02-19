@@ -6,10 +6,11 @@ import java.util.Objects;
 import nimbus.command.AddDeadlineCommand;
 import nimbus.command.AddEventCommand;
 import nimbus.command.AddTodoCommand;
-import nimbus.command.FindCommand;
 import nimbus.command.ByeCommand;
 import nimbus.command.Command;
 import nimbus.command.DeleteCommand;
+import nimbus.command.FindCommand;
+import nimbus.command.HelpCommand; // Added HelpCommand import
 import nimbus.command.ListCommand;
 import nimbus.command.MarkCommand;
 import nimbus.command.UnmarkCommand;
@@ -33,6 +34,8 @@ public class Parser {
     private static final String CMD_BYE = "bye";
     /** Keyword to list all tasks. */
     private static final String CMD_LIST = "list";
+    /** Keyword to help unsure users. */
+    private static final String CMD_HELP = "help";
     /** Keyword to mark a task as done. */
     private static final String CMD_MARK = "mark";
     /** Keyword to unmark a task. */
@@ -50,7 +53,7 @@ public class Parser {
     /** Keyword to update an existing task. */
     private static final String CMD_UPDATE = "update";
 
-    private static final String ERR_EMPTY_COMMAND = "The sky is silent... Please type a command.";
+    private static final String ERR_EMPTY_COMMAND = "The sky is silent... Please type a command or 'help' for guidance.";
     private static final String ERR_UNKNOWN_COMMAND = "I looked through the fog, but I don't know what that means.";
     private static final String ERR_DESC_EMPTY = "Storm clouds! The description cannot be empty.";
     private static final String ERR_INVALID_PIPE = "The clouds can't hold the '|' character. Please remove it.";
@@ -82,6 +85,7 @@ public class Parser {
         return switch (commandWord) {
             case CMD_BYE -> new ByeCommand();
             case CMD_LIST -> new ListCommand();
+            case CMD_HELP -> new HelpCommand();
             case CMD_MARK -> new MarkCommand(parseOneBasedIndex(rest, CMD_MARK));
             case CMD_UNMARK -> new UnmarkCommand(parseOneBasedIndex(rest, CMD_UNMARK));
             case CMD_DELETE -> new DeleteCommand(parseOneBasedIndex(rest, CMD_DELETE));
@@ -254,12 +258,8 @@ public class Parser {
             throw new NimbusException("Please specify which task number to update.");
         }
 
-        int index;
-        try {
-            index = Integer.parseInt(parts[0]) - 1;
-        } catch (NumberFormatException e) {
-            throw new NimbusException("Invalid task number provided for update.");
-        }
+        // Improved: Reuses parseOneBasedIndex to handle positive/integer validation consistently
+        int index = parseOneBasedIndex(parts[0], CMD_UPDATE) - 1;
 
         EditTaskDescriptor descriptor = new EditTaskDescriptor();
         if (parts.length > 1) {
