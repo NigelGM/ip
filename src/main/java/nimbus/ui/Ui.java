@@ -20,12 +20,10 @@ public class Ui {
 
     /**
      * Buffer used to store messages for retrieval by the GUI.
-     * This fixes the "Cannot resolve method" errors in Nimbus.java.
      */
     private final StringBuilder buffer = new StringBuilder();
 
     // --- Unicode Escape Constants for "Safe" Emojis ---
-    // Using escapes prevents rendering issues on different operating systems.
     private static final String ICON_CLOUD = "\u2601";      // ☁
     private static final String ICON_SUN = "\u2600";        // ☀
     private static final String ICON_LIGHTNING = "\u26A1";  // ⚡
@@ -85,6 +83,17 @@ public class Ui {
         buffer.append(msg).append("\n");
 
         return msg;
+    }
+
+    /**
+     * Displays a generic message to the user.
+     * Used by commands like HelpCommand to output standard text.
+     *
+     * @param message The message to display.
+     * @return The formatted message string.
+     */
+    public String showMessage(String message) {
+        return say(message);
     }
 
     /**

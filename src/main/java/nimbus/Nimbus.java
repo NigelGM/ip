@@ -2,6 +2,7 @@ package nimbus;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.logging.Logger;
 
 import nimbus.command.Command;
 import nimbus.exception.NimbusException;
@@ -12,36 +13,40 @@ import nimbus.task.TaskList;
 import nimbus.ui.Ui;
 
 /**
- * Main logic class for Nimbus.
+ * Represents the main logic controller for the Nimbus application.
  * <p>
- * In GUI mode (JavaFX), the UI calls {@link #getResponse(String)} for each user input.
- * Nimbus returns the formatted response as a {@code String}.
+ * This class coordinates the interactions between the {@code Ui}, {@code Storage},
+ * and {@code TaskList} components. In GUI mode, it provides the bridge between
+ * user input and the visual response.
  */
 public class Nimbus {
-
+    /** Default path for data persistence. */
     public static final String DEFAULT_FILE_PATH = "data/nimbus.txt";
+    private static final Logger logger = Logger.getLogger(Nimbus.class.getName());
 
     private final Storage storage;
     private final TaskList tasks;
     private final Ui ui;
-
     private boolean isExit;
 
     /**
-     * Creates Nimbus using the default save file path.
+     * Initializes Nimbus with the default storage file path.
      */
     public Nimbus() {
         this(DEFAULT_FILE_PATH);
     }
 
     /**
-     * Creates Nimbus using a custom save file path.
+     * Initializes Nimbus with a specific storage file path and loads existing tasks.
      *
-     * @param filePath path to save/load data
+     * @param filePath The relative path to the file where tasks are saved.
+     * @throws AssertionError if filePath is null.
      */
     public Nimbus(String filePath) {
         assert filePath != null : "File path should not be null";
 
+        // IMPORTANT FIX: Setting Ui to false disables terminal printing,
+        // relying solely on the internal StringBuilder buffer for GUI use.
         this.ui = new Ui(false);
         this.storage = new Storage(filePath);
         this.tasks = new TaskList();
@@ -51,9 +56,8 @@ public class Nimbus {
     }
 
     /**
-     * Returns Nimbus greeting message for GUI.
-     *
-     * @return greeting message
+     * Generates the initial greeting message for the user.
+     * * @return A formatted welcome string from the UI buffer.
      */
     public String getGreeting() {
         ui.resetBuffer();
@@ -62,48 +66,62 @@ public class Nimbus {
     }
 
     /**
-     * Processes a user input and returns Nimbus's response as a String.
-     * GUI should call this once per command.
+     * Processes a user input string, executes the resulting command, and returns
+     * the system's response for display in the GUI.
+     * <p>
+     * This method ensures that even if a command fails, the UI buffer is
+     * captured and returned to prevent the application from appearing unresponsive.
      *
-     * @param input user input
-     * @return Nimbus formatted response
+     * @param input The raw text entered by the user.
+     * @return The formatted response to be displayed in the chat bubble.
      */
     public String getResponse(String input) {
-        assert ui != null : "UI component failed to initialize";
-        assert storage != null : "Storage component failed to initialize";
-
         ui.resetBuffer();
 
         try {
             Command c = Parser.parse(input);
             c.execute(tasks, ui);
 
-            // Save after every command (safe and simple)
-            try {
-                storage.saveLines(tasks.toStorageLines());
-            } catch (IOException e) {
-                ui.showError("Could not save to file. Your changes may not persist.");
-            }
+            // Updates the application exit state based on the command
+            this.isExit = c.isExit();
 
-            isExit = c.isExit();
-            return ui.getBufferedOutput();
+            // Auto-save state after successful command execution
+            handleAutoSave();
 
         } catch (NimbusException e) {
-            isExit = false;
             ui.showError(e.getMessage());
-            return ui.getBufferedOutput();
+        }
+
+        // Return only the UI buffer. Ignored any return value from the execution.
+        return ui.getBufferedOutput();
+    }
+
+    /**
+     * Handles the background persistence of the task list.
+     * Errors during saving are communicated to the user but do not crash the app.
+     */
+    private void handleAutoSave() {
+        try {
+            storage.saveLines(tasks.toStorageLines());
+        } catch (IOException e) {
+            ui.showError("Warning: Unable to save changes to disk.");
+            logger.severe("Critical Storage Failure: " + e.getMessage());
         }
     }
 
     /**
-     * Whether the last processed command requested to exit.
+     * Indicates whether the last processed command was a termination command.
      *
-     * @return true if app should exit, false otherwise
+     * @return true if the application should close, false otherwise.
      */
     public boolean isExit() {
         return isExit;
     }
 
+    /**
+     * Populates the task list from the storage file on startup.
+     * If the file is missing or corrupted, initializes an empty list.
+     */
     private void loadFromStorage() {
         try {
             List<String> lines = storage.loadLines();
@@ -114,7 +132,7 @@ public class Nimbus {
                 }
             }
         } catch (IOException | NimbusException e) {
-            // First run / no file yet -> start empty (no need to scare user)
+            logger.info("No valid save file found. Starting with an empty TaskList.");
         }
     }
 }

@@ -12,15 +12,15 @@ import nimbus.ui.Ui;
 public class HelpCommand extends Command {
 
     /**
-     * Executes the help command by returning a guide string.
+     * Executes the help command by pushing a guide string to the UI buffer.
      *
      * @param tasks The list of tasks (unused).
-     * @param ui    The user interface (unused).
-     * @return A string containing the list of available commands and usage examples.
+     * @param ui    The user interface used to display the help message.
+     * @return An empty string, as the output is handled directly by the UI buffer.
      */
     @Override
     public String execute(TaskList tasks, Ui ui) {
-        return """
+        String helpMessage = """
                 Lost in the clouds? Here's how to navigate:
                 1. todo <desc> - Add a simple task
                 2. deadline <desc> /by <time> - Add a task with a deadline
@@ -29,8 +29,15 @@ public class HelpCommand extends Command {
                 5. mark/unmark <index> - Change task status
                 6. delete <index> - Remove a task
                 7. find <keyword> - Search for tasks
-                8. bye - Exit the application
+                8. update <index> <details> - Update an existing task
+                9. bye - Exit the application
                 """;
+
+        // Push the message to the single source of truth (the buffer)
+        ui.showMessage(helpMessage);
+
+        // Return an empty string since Nimbus.java now ignores this return value
+        return "";
     }
 
     /**
