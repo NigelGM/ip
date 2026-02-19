@@ -57,7 +57,7 @@ public class Nimbus {
 
     /**
      * Generates the initial greeting message for the user.
-     * * @return A formatted welcome string from the UI buffer.
+     * @return A formatted welcome string from the UI buffer.
      */
     public String getGreeting() {
         ui.resetBuffer();

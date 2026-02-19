@@ -53,16 +53,24 @@ public class Parser {
     /** Keyword to update an existing task. */
     private static final String CMD_UPDATE = "update";
 
-    private static final String ERR_EMPTY_COMMAND = "The sky is silent... Please type a command or 'help' for guidance.";
-    private static final String ERR_UNKNOWN_COMMAND = "I looked through the fog, but I don't know what that means.";
-    private static final String ERR_DESC_EMPTY = "Storm clouds! The description cannot be empty.";
-    private static final String ERR_INVALID_PIPE = "The clouds can't hold the '|' character. Please remove it.";
-    private static final String ERR_NO_INDEX = "I need a task number to reach that cloud for: ";
-    private static final String ERR_INVALID_INDEX = "Please provide a valid positive task number for: ";
+    private static final String ERR_EMPTY_COMMAND =
+            "The sky is silent... Please type a command or 'help' for guidance.";
+    private static final String ERR_UNKNOWN_COMMAND =
+            "I looked through the fog, but I don't know what that means.";
+    private static final String ERR_DESC_EMPTY =
+            "Storm clouds! The description cannot be empty.";
+    private static final String ERR_INVALID_PIPE =
+            "The clouds can't hold the '|' character. Please remove it.";
+    private static final String ERR_NO_INDEX =
+            "I need a task number to reach that cloud for: ";
+    private static final String ERR_INVALID_INDEX =
+            "Please provide a valid positive task number for: ";
 
     private static final String USAGE_FIND = "Usage: find <keyword>";
-    private static final String USAGE_DEADLINE = "Usage: deadline <description> /by <yyyy-mm-dd HHmm>";
-    private static final String USAGE_EVENT = "Usage: event <desc> /from <time> /to <time>";
+    private static final String USAGE_DEADLINE =
+            "Usage: deadline <description> /by <yyyy-mm-dd HHmm>";
+    private static final String USAGE_EVENT =
+            "Usage: event <desc> /from <time> /to <time>";
 
     /**
      * Parses a full command line into a specific {@link Command}.
@@ -83,18 +91,18 @@ public class Parser {
         String rest = parts.length > 1 ? parts[1].trim() : "";
 
         return switch (commandWord) {
-            case CMD_BYE -> new ByeCommand();
-            case CMD_LIST -> new ListCommand();
-            case CMD_HELP -> new HelpCommand();
-            case CMD_MARK -> new MarkCommand(parseOneBasedIndex(rest, CMD_MARK));
-            case CMD_UNMARK -> new UnmarkCommand(parseOneBasedIndex(rest, CMD_UNMARK));
-            case CMD_DELETE -> new DeleteCommand(parseOneBasedIndex(rest, CMD_DELETE));
-            case CMD_FIND -> prepareFind(rest);
-            case CMD_TODO -> prepareTodo(rest);
-            case CMD_DEADLINE -> parseDeadline(rest);
-            case CMD_EVENT -> parseEvent(rest);
-            case CMD_UPDATE -> prepareUpdate(rest);
-            default -> throw new NimbusException(ERR_UNKNOWN_COMMAND);
+        case CMD_BYE -> new ByeCommand();
+        case CMD_LIST -> new ListCommand();
+        case CMD_HELP -> new HelpCommand();
+        case CMD_MARK -> new MarkCommand(parseOneBasedIndex(rest, CMD_MARK));
+        case CMD_UNMARK -> new UnmarkCommand(parseOneBasedIndex(rest, CMD_UNMARK));
+        case CMD_DELETE -> new DeleteCommand(parseOneBasedIndex(rest, CMD_DELETE));
+        case CMD_FIND -> prepareFind(rest);
+        case CMD_TODO -> prepareTodo(rest);
+        case CMD_DEADLINE -> parseDeadline(rest);
+        case CMD_EVENT -> parseEvent(rest);
+        case CMD_UPDATE -> prepareUpdate(rest);
+        default -> throw new NimbusException(ERR_UNKNOWN_COMMAND);
         };
     }
 
@@ -225,20 +233,24 @@ public class Parser {
         Objects.requireNonNull(line, "Storage line cannot be null");
         try {
             String[] parts = line.split("\\s*\\|\\s*");
-            if (parts.length < 3) return null;
+            if (parts.length < 3) {
+                return null;
+            }
 
             String type = parts[0];
             boolean isDone = "1".equals(parts[1]);
             String desc = parts[2];
 
             return switch (type) {
-                case "T" -> new Todo(desc, isDone);
-                case "D" -> (parts.length >= 4)
-                        ? new Deadline(desc, DateTimeUtil.parseDateTime(parts[3]), isDone) : null;
-                case "E" -> (parts.length >= 5)
-                        ? new Event(desc, DateTimeUtil.parseDateTime(parts[3]),
-                        DateTimeUtil.parseDateTime(parts[4]), isDone) : null;
-                default -> null;
+            case "T" -> new Todo(desc, isDone);
+            case "D" -> (parts.length >= 4)
+                    ? new Deadline(desc, DateTimeUtil.parseDateTime(parts[3]), isDone)
+                    : null;
+            case "E" -> (parts.length >= 5)
+                    ? new Event(desc, DateTimeUtil.parseDateTime(parts[3]),
+                    DateTimeUtil.parseDateTime(parts[4]), isDone)
+                    : null;
+            default -> null;
             };
         } catch (Exception e) {
             return null;
@@ -269,16 +281,30 @@ public class Parser {
             int toIdx = params.indexOf(" /to ");
 
             int cutOff = params.length();
-            if (byIdx != -1) cutOff = Math.min(cutOff, byIdx);
-            if (fromIdx != -1) cutOff = Math.min(cutOff, fromIdx);
-            if (toIdx != -1) cutOff = Math.min(cutOff, toIdx);
+            if (byIdx != -1) {
+                cutOff = Math.min(cutOff, byIdx);
+            }
+            if (fromIdx != -1) {
+                cutOff = Math.min(cutOff, fromIdx);
+            }
+            if (toIdx != -1) {
+                cutOff = Math.min(cutOff, toIdx);
+            }
 
             String potentialDesc = params.substring(0, cutOff).trim();
-            if (!potentialDesc.isEmpty()) descriptor.setDescription(potentialDesc);
+            if (!potentialDesc.isEmpty()) {
+                descriptor.setDescription(potentialDesc);
+            }
 
-            if (byIdx != -1) descriptor.setBy(extractArg(params, byIdx + 5, new int[]{fromIdx, toIdx}));
-            if (fromIdx != -1) descriptor.setFrom(extractArg(params, fromIdx + 7, new int[]{byIdx, toIdx}));
-            if (toIdx != -1) descriptor.setTo(extractArg(params, toIdx + 5, new int[]{byIdx, fromIdx}));
+            if (byIdx != -1) {
+                descriptor.setBy(extractArg(params, byIdx + 5, new int[] { fromIdx, toIdx }));
+            }
+            if (fromIdx != -1) {
+                descriptor.setFrom(extractArg(params, fromIdx + 7, new int[] { byIdx, toIdx }));
+            }
+            if (toIdx != -1) {
+                descriptor.setTo(extractArg(params, toIdx + 5, new int[] { byIdx, fromIdx }));
+            }
         }
         return new UpdateCommand(index, descriptor);
     }
@@ -294,7 +320,9 @@ public class Parser {
     private static String extractArg(String full, int start, int[] others) {
         int end = full.length();
         for (int idx : others) {
-            if (idx > start && idx < end) end = idx;
+            if (idx > start && idx < end) {
+                end = idx;
+            }
         }
         return full.substring(start, end).trim();
     }

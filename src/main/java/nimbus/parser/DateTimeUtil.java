@@ -1,12 +1,12 @@
 package nimbus.parser;
 
-import nimbus.exception.NimbusException;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+
+import nimbus.exception.NimbusException;
 
 /**
  * Provides centralized utility methods for parsing and formatting {@link LocalDateTime} objects.
@@ -17,7 +17,8 @@ import java.time.format.DateTimeParseException;
  */
 public class DateTimeUtil {
 
-    /** * Pattern for date-only user input: {@code yyyy-MM-dd} (e.g., 2019-12-02).
+    /**
+     * Pattern for date-only user input: {@code yyyy-MM-dd} (e.g., 2019-12-02).
      */
     private static final DateTimeFormatter INPUT_DATE =
             DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -26,34 +27,43 @@ public class DateTimeUtil {
     private static final DateTimeFormatter STORAGE_FORMATTER =
             DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm");
 
-    /** * Pattern for date and time user input: {@code yyyy-MM-dd HHmm} (e.g., 2019-12-02 1800).
+    /**
+     * Pattern for date and time user input: {@code yyyy-MM-dd HHmm} (e.g., 2019-12-02 1800).
      */
     private static final DateTimeFormatter INPUT_DATE_TIME =
             DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm");
 
-    /** * Pattern for date-only display output: {@code MMM dd yyyy} (e.g., Dec 02 2019).
+    /**
+     * Pattern for date-only display output: {@code MMM dd yyyy} (e.g., Dec 02 2019).
      */
     private static final DateTimeFormatter OUTPUT_DATE =
             DateTimeFormatter.ofPattern("MMM dd yyyy");
 
-    /** * Pattern for date and time display output: {@code MMM dd yyyy, h:mm a} (e.g., Dec 02 2019, 6:00 PM).
+    /**
+     * Pattern for date and time display output: {@code MMM dd yyyy, h:mm a} (e.g., Dec 02 2019, 6:00 PM).
      */
     private static final DateTimeFormatter OUTPUT_DATE_TIME =
             DateTimeFormatter.ofPattern("MMM dd yyyy, h:mm a");
 
     /**
+     * Private constructor to prevent instantiation of this utility class.
+     */
+    private DateTimeUtil() {
+        // Utility class; no instances
+    }
+
+    /**
      * Parses a string representation of a date and/or time into a {@link LocalDateTime} object.
-     * * <p>The method attempts to parse the input in the following order of precedence:</p>
+     * <p>The method attempts to parse the input in the following order of precedence:</p>
      * <ol>
      * <li><b>ISO Format:</b> If the string contains 'T' (e.g., {@code 2019-12-02T18:00:00}).</li>
      * <li><b>User Date-Time:</b> If the string contains a space (e.g., {@code 2019-12-02 1800}).</li>
      * <li><b>User Date-Only:</b> Defaults to the start of the day (e.g., {@code 2019-12-02}).</li>
      * </ol>
-     *
      * @param raw The raw input string to be parsed.
      * @return A {@link LocalDateTime} object representing the input string.
      * @throws NimbusException If the input is {@code null}, blank, or does not match any
-     * recognized format.
+     *     recognized format.
      */
     public static LocalDateTime parseDateTime(String raw) throws NimbusException {
         if (raw == null) {
@@ -117,13 +127,6 @@ public class DateTimeUtil {
     }
 
     /**
-     * Private constructor to prevent instantiation of this utility class.
-     */
-    private DateTimeUtil() {
-        // Utility class; no instances
-    }
-
-    /**
      * This fixes the "Cannot resolve method" error.
      */
     public static String formatForStorage(LocalDateTime dateTime) {
@@ -131,5 +134,6 @@ public class DateTimeUtil {
     }
 
 }
+
 
 

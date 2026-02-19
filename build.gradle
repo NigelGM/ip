@@ -2,8 +2,7 @@ plugins {
     id 'java'
     id 'application'
     id 'com.github.johnrengelman.shadow' version '7.1.2'
-    // Note: Do NOT use the org.openjfx.javafxplugin if your
-    // tutorial specifically asks for manual implementation.
+    id "checkstyle"
 }
 
 repositories {
@@ -57,4 +56,8 @@ test {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
+}
+
+checkstyle {
+    toolVersion = '11.0.0'
 }

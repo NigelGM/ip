@@ -1,6 +1,7 @@
 package nimbus.command;
 
 import java.time.LocalDateTime;
+
 import nimbus.exception.NimbusException;
 import nimbus.task.Event;
 import nimbus.task.TaskList;
@@ -14,6 +15,9 @@ public class AddEventCommand extends Command {
     private final LocalDateTime from;
     private final LocalDateTime to;
 
+    /**
+     * Constructs a command to add an event task.
+     */
     public AddEventCommand(String description, LocalDateTime from, LocalDateTime to) {
         this.description = description;
         this.from = from;

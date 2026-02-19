@@ -98,7 +98,8 @@ public class UpdateCommand extends Command {
      * Helper to create an Event task.
      * Uses Pattern Matching to simplify logic.
      */
-    private Event createNewEvent(Task original, EditTaskDescriptor descriptor, String description, boolean isDone) throws NimbusException {
+    private Event createNewEvent(Task original, EditTaskDescriptor descriptor,
+                                 String description, boolean isDone) throws NimbusException {
         LocalDateTime from;
         LocalDateTime to;
 
@@ -143,16 +144,36 @@ public class UpdateCommand extends Command {
         private String from;
         private String to;
 
-        public void setDescription(String description) { this.description = description; }
-        public Optional<String> getDescription() { return Optional.ofNullable(description); }
+        public void setDescription(String description) {
+            this.description = description;
+        }
 
-        public void setBy(String by) { this.by = by; }
-        public Optional<String> getBy() { return Optional.ofNullable(by); }
+        public Optional<String> getDescription() {
+            return Optional.ofNullable(description);
+        }
 
-        public void setFrom(String from) { this.from = from; }
-        public Optional<String> getFrom() { return Optional.ofNullable(from); }
+        public void setBy(String by) {
+            this.by = by;
+        }
 
-        public void setTo(String to) { this.to = to; }
-        public Optional<String> getTo() { return Optional.ofNullable(to); }
+        public Optional<String> getBy() {
+            return Optional.ofNullable(by);
+        }
+
+        public void setFrom(String from) {
+            this.from = from;
+        }
+
+        public Optional<String> getFrom() {
+            return Optional.ofNullable(from);
+        }
+
+        public void setTo(String to) {
+            this.to = to;
+        }
+
+        public Optional<String> getTo() {
+            return Optional.ofNullable(to);
+        }
     }
 }

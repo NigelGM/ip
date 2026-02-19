@@ -80,8 +80,8 @@ public class TaskList {
      */
     private boolean isDuplicateTask(Task newTask) {
         return tasks.stream().anyMatch(t ->
-                t.getType() == newTask.getType() &&
-                        t.getDescription().equalsIgnoreCase(newTask.getDescription())
+                t.getType() == newTask.getType()
+                        && t.getDescription().equalsIgnoreCase(newTask.getDescription())
         );
     }
 

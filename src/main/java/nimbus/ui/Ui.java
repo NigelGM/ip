@@ -1,11 +1,12 @@
 package nimbus.ui;
 
-import nimbus.exception.NimbusException;
-import nimbus.task.Task;
-import nimbus.task.TaskList;
 
 import java.util.List;
 import java.util.Random;
+
+import nimbus.exception.NimbusException;
+import nimbus.task.Task;
+import nimbus.task.TaskList;
 
 /**
  * Handles all user-facing messages for the Nimbus application.
@@ -15,6 +16,20 @@ import java.util.Random;
  */
 public class Ui {
 
+    // --- Unicode Escape Constants for "Safe" Emojis ---
+    private static final String ICON_CLOUD = "\u2601"; // ☁
+
+    private static final String ICON_SUN = "\u2600"; // ☀
+
+    private static final String ICON_LIGHTNING = "\u26A1"; // ⚡
+
+    private static final String ICON_SPARKLES = "\u2728"; // ✨
+
+    private static final String ICON_WAVE = "\uD83D\uDC4B"; // 👋
+
+    private static final String ICON_MEMO = "\uD83D\uDCDD"; // 📝
+
+
     private final boolean isPrintingToConsole;
     private final Random random = new Random();
 
@@ -22,14 +37,6 @@ public class Ui {
      * Buffer used to store messages for retrieval by the GUI.
      */
     private final StringBuilder buffer = new StringBuilder();
-
-    // --- Unicode Escape Constants for "Safe" Emojis ---
-    private static final String ICON_CLOUD = "\u2601";      // ☁
-    private static final String ICON_SUN = "\u2600";        // ☀
-    private static final String ICON_LIGHTNING = "\u26A1";  // ⚡
-    private static final String ICON_SPARKLES = "\u2728";   // ✨
-    private static final String ICON_WAVE = "\uD83D\uDC4B"; // 👋
-    private static final String ICON_MEMO = "\uD83D\uDCDD"; // 📝
 
     /**
      * Constructs a default {@code Ui} instance that prints to the console.
@@ -103,9 +110,9 @@ public class Ui {
      */
     public String showGreeting() {
         String[] greetings = {
-                "Floating in... " + ICON_CLOUD + " I'm Nimbus.\nWhat's on your horizon today?",
-                "Skies are clearing up! " + ICON_SUN + "\nHow can I help you organize your day?",
-                "Hello! I'm Nimbus, your personal cloud assistant.\nReady to weather the storm?"
+            "Floating in... " + ICON_CLOUD + " I'm Nimbus.\nWhat's on your horizon today?",
+            "Skies are clearing up! " + ICON_SUN + "\nHow can I help you organize your day?",
+            "Hello! I'm Nimbus, your personal cloud assistant.\nReady to weather the storm?"
         };
         return say(greetings[random.nextInt(greetings.length)]);
     }
