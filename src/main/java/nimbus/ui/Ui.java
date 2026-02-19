@@ -3,6 +3,7 @@ package nimbus.ui;
 import nimbus.exception.NimbusException;
 import nimbus.task.Task;
 import nimbus.task.TaskList;
+
 import java.util.List;
 import java.util.Random;
 
@@ -10,15 +11,21 @@ import java.util.Random;
  * Handles all user-facing messages for the Nimbus application.
  * <p>
  * This class implements "The Chill Cloud" personality with weather-themed responses.
- * To prevent rendering issues (empty boxes) in the GUI, all emojis are represented
- * using specific Unicode escape sequences.
+ * It supports both console printing (for text UI) and a string buffer (for JavaFX GUI).
  */
 public class Ui {
 
     private final boolean isPrintingToConsole;
     private final Random random = new Random();
 
+    /**
+     * Buffer used to store messages for retrieval by the GUI.
+     * This fixes the "Cannot resolve method" errors in Nimbus.java.
+     */
+    private final StringBuilder buffer = new StringBuilder();
+
     // --- Unicode Escape Constants for "Safe" Emojis ---
+    // Using escapes prevents rendering issues on different operating systems.
     private static final String ICON_CLOUD = "\u2601";      // ☁
     private static final String ICON_SUN = "\u2600";        // ☀
     private static final String ICON_LIGHTNING = "\u26A1";  // ⚡
@@ -43,24 +50,45 @@ public class Ui {
     }
 
     /**
-     * Internal helper to print messages to console (if enabled) and return them.
+     * Resets the internal message buffer.
+     * Called by Nimbus before processing a new command to ensure the GUI only shows the latest response.
+     */
+    public void resetBuffer() {
+        buffer.setLength(0);
+    }
+
+    /**
+     * Returns the accumulated messages as a single String.
+     * Used by the GUI to display the bot's response in the dialog box.
      *
-     * @param msg The message to be displayed.
-     * @return The message string.
+     * @return The formatted response string.
+     */
+    public String getBufferedOutput() {
+        return buffer.toString().trim();
+    }
+
+    /**
+     * Internal helper to print to console (if enabled) AND append to the GUI buffer.
+     *
+     * @param msg The message to be processed.
+     * @return The original message string.
      */
     private String say(String msg) {
         assert msg != null : "Output message cannot be null";
+
+        // 1. Print to console (for debugging or CLI mode)
         if (isPrintingToConsole) {
             System.out.println(msg);
         }
+
+        // 2. Append to buffer (for JavaFX GUI)
+        buffer.append(msg).append("\n");
+
         return msg;
     }
 
     /**
-     * Returns a random weather-themed greeting to make the bot feel alive.
-     * <p>
-     * <b>Fix:</b> Uses Unicode escapes to ensure emojis like the sun and cloud
-     * render without trailing blocks.
+     * Returns a random weather-themed greeting.
      *
      * @return A random greeting message.
      */
@@ -74,7 +102,7 @@ public class Ui {
     }
 
     /**
-     * Returns a formatted goodbye message with a waving theme.
+     * Returns a goodbye message.
      *
      * @return The goodbye message.
      */
@@ -83,12 +111,9 @@ public class Ui {
     }
 
     /**
-     * Returns an error message.
-     * <p>
-     * <b>CRITICAL:</b> This message starts with "Error:" to trigger the
-     * red error bubble styling in the GUI.
+     * Returns an error message. Starting with "Error:" helps trigger specific GUI styling.
      *
-     * @param message The error details to be shown.
+     * @param message The error details.
      * @return The formatted error message.
      */
     public String showError(String message) {
@@ -96,10 +121,10 @@ public class Ui {
     }
 
     /**
-     * Returns a message confirming a task has been successfully added.
+     * Confirms a task has been added.
      *
-     * @param task       The task that was added.
-     * @param totalTasks The new total count of tasks in the list.
+     * @param task       The added task.
+     * @param totalTasks The new total count.
      * @return The confirmation message.
      */
     public String showAdded(Task task, int totalTasks) {
@@ -108,10 +133,10 @@ public class Ui {
     }
 
     /**
-     * Returns a message confirming a task has been removed.
+     * Confirms a task has been removed.
      *
-     * @param task       The task that was removed.
-     * @param totalTasks The remaining total count of tasks in the list.
+     * @param task       The removed task.
+     * @param totalTasks The remaining count.
      * @return The deletion confirmation message.
      */
     public String showDeleted(Task task, int totalTasks) {
@@ -120,40 +145,31 @@ public class Ui {
     }
 
     /**
-     * Returns a message confirming a task has been marked as completed.
-     *
-     * @param task The task that was marked.
-     * @return The confirmation message.
+     * Confirms a task has been marked as completed.
      */
     public String showMarked(Task task) {
         return say("Brilliant like sunshine! " + ICON_SPARKLES + "\nI've marked this task as done:\n  " + task);
     }
 
     /**
-     * Returns a message confirming a task has been set to incomplete.
-     *
-     * @param task The task that was unmarked.
-     * @return The confirmation message.
+     * Confirms a task has been set to incomplete.
      */
     public String showUnmarked(Task task) {
         return say("Cloudy with a chance of work. " + ICON_CLOUD + "\nI've marked this task as not done:\n  " + task);
     }
 
     /**
-     * Returns a message confirming a task has been updated.
-     *
-     * @param task The task that was updated.
-     * @return The confirmation message.
+     * Confirms a task has been updated.
      */
     public String showUpdated(Task task) {
         return say("The winds of change have blown! " + ICON_MEMO + "\nUpdated task details:\n  " + task);
     }
 
     /**
-     * Returns the formatted list of all tasks currently in the list.
+     * Displays all tasks in the list.
      *
      * @param tasks The {@link TaskList} to format.
-     * @return A formatted string of all tasks, or an empty list message.
+     * @return The formatted list string.
      */
     public String showList(TaskList tasks) {
         if (tasks.size() == 0) {
@@ -167,11 +183,7 @@ public class Ui {
     }
 
     /**
-     * Returns formatted results for a keyword search.
-     *
-     * @param keyword The search keyword used.
-     * @param results The list of tasks matching the keyword.
-     * @return A formatted string of search results.
+     * Formats search results for a keyword.
      */
     public String showFindResults(String keyword, List<Task> results) {
         if (results.isEmpty()) {

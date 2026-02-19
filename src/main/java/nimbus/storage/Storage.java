@@ -22,7 +22,7 @@ public class Storage {
      * @param lines List of task strings in storage format.
      * @throws IOException If writing to disk fails.
      */
-    public void save(List<String> lines) throws IOException {
+    public void saveLines(List<String> lines) throws IOException {
         if (path.getParent() != null) {
             Files.createDirectories(path.getParent());
         }

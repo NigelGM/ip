@@ -113,7 +113,7 @@ public class Nimbus {
                     tasks.add(t);
                 }
             }
-        } catch (IOException e) {
+        } catch (IOException | NimbusException e) {
             // First run / no file yet -> start empty (no need to scare user)
         }
     }
