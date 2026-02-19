@@ -14,7 +14,7 @@ public abstract class Task {
     /**
      * Constructs a Task with the given type and description.
      *
-     * @param type Task type.
+     * @param type        Task type.
      * @param description Task description.
      */
     protected Task(TaskType type, String description) {
@@ -26,14 +26,14 @@ public abstract class Task {
     /**
      * Marks this task as done.
      */
-    public void markDone() {
+    public void markAsDone() {
         this.isDone = true;
     }
 
     /**
      * Marks this task as not done.
      */
-    public void unmark() {
+    public void unmarkAsDone() {
         this.isDone = false;
     }
 
@@ -84,7 +84,10 @@ public abstract class Task {
 
     /**
      * Converts this task into a string suitable for storing in the save file.
-     * Subclasses should override if they include additional fields.
+     * <p>
+     * Base format: {@code TYPE | DONE_STATUS | DESCRIPTION}
+     * (e.g., "T | 1 | read book")
+     * </p>
      *
      * @return Storage string format.
      */

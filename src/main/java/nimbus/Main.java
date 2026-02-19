@@ -11,7 +11,7 @@ import nimbus.ui.MainWindow;
  */
 public class Main extends Application {
 
-    private final Nimbus nimbus = new Nimbus();
+    private final Nimbus nimbus = new Nimbus("data/nimbus.txt");
 
     @Override
     public void start(Stage stage) throws Exception {

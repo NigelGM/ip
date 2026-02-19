@@ -11,7 +11,8 @@
          type="javafx.scene.layout.HBox"
          xmlns="http://javafx.com/javafx/17.0.2-ea"
          xmlns:fx="http://javafx.com/fxml/1"
-         spacing="10">
+         spacing="10"
+         styleClass="dialog-box">
     <Label fx:id="dialog" text="Label" wrapText="true" minHeight="-Infinity" />
     <ImageView fx:id="displayPicture" fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" />
     <padding>

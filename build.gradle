@@ -50,3 +50,7 @@ shadowJar {
 run {
     enableAssertions = true
 }
+
+test {
+    useJUnitPlatform()
+}
