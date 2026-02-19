@@ -40,7 +40,9 @@ public class Nimbus {
      * @param filePath path to save/load data
      */
     public Nimbus(String filePath) {
-        this.ui = new Ui(false); // false = do not print to console, only buffer
+        assert filePath != null : "File path should not be null";
+
+        this.ui = new Ui(false);
         this.storage = new Storage(filePath);
         this.tasks = new TaskList();
         this.isExit = false;
@@ -67,6 +69,9 @@ public class Nimbus {
      * @return Nimbus formatted response
      */
     public String getResponse(String input) {
+        assert ui != null : "UI component failed to initialize";
+        assert storage != null : "Storage component failed to initialize";
+
         ui.resetBuffer();
 
         try {
