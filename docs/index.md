@@ -49,11 +49,13 @@ Format: `todo <description>`
 
 ### Adding a deadline: `deadline`
 Adds a task that needs to be done before a specific date and time. The date format must be `yyyy-mm-dd HHmm`.
+The time component is optional. If omitted, the deadline defaults to the end of the day.
 
-Format: `deadline <description> /by <date>`
+Full Format: `deadline <description> /by yyyy-mm-dd HHmm`
+Minimal Format: `deadline <description> /by yyyy-mm-dd`
 
 **Example:**
-`deadline return library book /by 2026-02-20 1800`
+`deadline return library book /by 2026-02-20`
 
 **Expected outcome:**
 ![Result of adding a deadline](deadline.png)
@@ -71,6 +73,7 @@ Format: `event <description> /from <start> /to <end>`
 
 ### Listing tasks: `list`
 Displays all tasks currently in your list, showing their index, type, status, and details.
+
 
 Format: `list`
 
@@ -90,6 +93,8 @@ Format: `find <keyword>`
 
 ### Updating a task: `update`
 Updates the details of an existing task without deleting it. You can update the description, the deadline time, or the event start/end times.
+If you provide the command without new values, Nimbus will confirm the "update," but your data will remain unchanged.
+You can update just the description by typing after the index, or use /by, /from, or /to to update specific timing.
 
 Format: `update <index> <flag> <value>`
 
