@@ -1,5 +1,7 @@
 # Nimbus User Guide
 
+![img.png](img.png)
+
 **Nimbus** is a weather-themed desktop task manager. It is optimized for users who prefer a Command Line Interface (CLI) but enjoy the visual feedback of a Graphical User Interface (GUI). Nimbus helps you navigate the "clouds" of your schedule with a chill, atmospheric personality.
 
 ## Quick Start
