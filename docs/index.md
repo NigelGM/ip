@@ -55,7 +55,7 @@ Full Format: `deadline <description> /by yyyy-mm-dd HHmm`
 Minimal Format: `deadline <description> /by yyyy-mm-dd`
 
 **Example:**
-`deadline return library book /by 2026-02-20`
+`deadline return library book /by 2026-02-20 1800`
 
 **Expected outcome:**
 ![Result of adding a deadline](deadline.png)
