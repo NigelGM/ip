@@ -81,6 +81,10 @@ public class Parser {
      * @throws NullPointerException If {@code fullCommand} is null.
      */
     public static Command parse(String fullCommand) throws NimbusException {
+        if (fullCommand.contains("|")) {
+            throw new NimbusException("Hold up! The '|' character is used to separate data in my internal clouds. Please do not use it in your commands!");
+        }
+
         String trimmed = Objects.requireNonNull(fullCommand, "Command input cannot be null").trim();
         if (trimmed.isEmpty()) {
             throw new NimbusException(ERR_EMPTY_COMMAND);

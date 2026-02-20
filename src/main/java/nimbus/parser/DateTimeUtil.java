@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.time.format.ResolverStyle;
 
 import nimbus.exception.NimbusException;
 
@@ -18,20 +19,23 @@ import nimbus.exception.NimbusException;
 public class DateTimeUtil {
 
     /**
-     * Pattern for date-only user input: {@code yyyy-MM-dd} (e.g., 2019-12-02).
+     * Pattern for date-only user input: {@code uuuu-MM-dd} (e.g., 2019-12-02).
      */
     private static final DateTimeFormatter INPUT_DATE =
-            DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            DateTimeFormatter.ofPattern("uuuu-MM-dd")
+            .withResolverStyle(ResolverStyle.STRICT);
 
     // Add this for your Storage file
     private static final DateTimeFormatter STORAGE_FORMATTER =
-            DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm");
+            DateTimeFormatter.ofPattern("uuuu-MM-dd HHmm")
+            .withResolverStyle(ResolverStyle.STRICT);
 
     /**
-     * Pattern for date and time user input: {@code yyyy-MM-dd HHmm} (e.g., 2019-12-02 1800).
+     * Pattern for date and time user input: {@code uuuu-MM-dd HHmm} (e.g., 2019-12-02 1800).
      */
     private static final DateTimeFormatter INPUT_DATE_TIME =
-            DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm");
+            DateTimeFormatter.ofPattern("uuuu-MM-dd HHmm")
+            .withResolverStyle(ResolverStyle.STRICT);
 
     /**
      * Pattern for date-only display output: {@code MMM dd yyyy} (e.g., Dec 02 2019).

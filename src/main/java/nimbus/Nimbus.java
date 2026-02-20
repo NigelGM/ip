@@ -135,6 +135,16 @@ public class Nimbus {
             logger.info("No valid save file found. Starting with an empty TaskList.");
         }
     }
+
+    /**
+     * Main entry point for the Nimbus application logic.
+     * This method is typically called by the {@code Launcher} class to start the GUI.
+     *
+     * @param args Command line arguments.
+     */
+    public static void main(String[] args) {
+        javafx.application.Application.launch(Main.class, args);
+    }
 }
 
 

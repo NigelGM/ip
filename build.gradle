@@ -44,6 +44,9 @@ application {
 shadowJar {
     archiveBaseName = "nimbus"
     archiveClassifier = null
+    manifest {
+        attributes 'Main-Class': 'nimbus.Launcher'
+    }
 }
 
 run {
